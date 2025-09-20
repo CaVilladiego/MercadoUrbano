@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:15
+    container_name: mu_postgres
+    environment:
+      POSTGRES_USER: mu
+      POSTGRES_PASSWORD: mu
+      POSTGRES_DB: mercadourbano
+    ports: ["5432:5432"]
+    volumes: [ "db_data:/var/lib/postgresql/data" ]
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: mu_rabbitmq
+    ports: ["5672:5672", "15672:15672"]
+    environment:
+      RABBITMQ_DEFAULT_USER: mu
+      RABBITMQ_DEFAULT_PASS: mu
+
+volumes:
+  db_data:
