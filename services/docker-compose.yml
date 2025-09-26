@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: mu
+      POSTGRES_PASSWORD: mu
+      POSTGRES_DB: mercadourbano
+    ports:
+      - "5432:5432"
+    volumes:
+      - mu_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mu -d mercadourbano"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+volumes:
+  mu_db:

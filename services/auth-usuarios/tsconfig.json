@@ -1,18 +1,23 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "declaration": false,
-    "removeComments": true,
+    "target": "ES2020",
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "es2018",
-    "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": "./"
+    "esModuleInterop": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@domain/*": ["core/domain/*"],
+      "@app/*": ["core/application/*"],
+      "@infra/*": ["infrastructure/*"],
+      "@interface/*": ["interface/*"]
+    }
   },
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }
