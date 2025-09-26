@@ -1,21 +1,26 @@
 version: "3.9"
 services:
-  auth-usuarios-db:
+  db:
     image: postgres:16
-    container_name: auth-usuarios-db
     environment:
       POSTGRES_USER: mu
       POSTGRES_PASSWORD: mu
-      POSTGRES_DB: auth_usuarios_db
+      POSTGRES_DB: mercadourbano
     ports:
       - "5432:5432"
     volumes:
-      - auth_usuarios_db_data:/var/lib/postgresql/data
+      - mu_db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mu -d auth_usuarios_db"]
+      test: ["CMD-SHELL", "pg_isready -U mu -d mercadourbano"]
       interval: 5s
       timeout: 5s
       retries: 20
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
 volumes:
-  auth_usuarios_db_data:
+  mu_db:
