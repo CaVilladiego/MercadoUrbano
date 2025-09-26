@@ -20,11 +20,16 @@ export class LoginUserUseCase {
     const ok = await this.hasher.compare(input.password, user.passwordHash);
     if (!ok) throw new Error('InvalidCredentials');
 
-    const access_token = await this.signer.sign({
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    });
+    // Forzamos un expiresIn seguro al firmar
+    const access_token = await this.signer.sign(
+      {
+        sub: user.id,
+        email: user.email,
+        role: user.Rol,
+      },
+      { expiresIn: '1h' }
+    );
+
     return { access_token };
   }
 }

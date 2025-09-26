@@ -18,14 +18,29 @@ export class RegisterUserUseCase {
     if (exists) throw new Error('EmailAlreadyInUse');
 
     const passwordHash = await this.hasher.hash(input.password);
+
     const entity = await this.repo.create({
       email: input.email,
       passwordHash,
-      fullName: input.fullName,
-      role: input.role ?? 'USER',
+      PrimerNombre: input.PrimerNombre,
+      SegundoNombre: input.SegundoNombre,
+      Apellido: input.Apellido,
+      Telefono: input.Telefono,
+      Rol: input.Rol ?? 'Cliente',
+      Direccion: input.Direccion,
+      Ciudad: input.Ciudad,
+      Departamento: input.Departamento,
+      Pais: input.Pais,
+      CodigoPostal: input.CodigoPostal,
+      Referencia: input.Referencia,
+      // Solo crea Tiendas si el rol es Vendedor y realmente vienen datos
+      Tiendas:
+        input.Rol === 'Vendedor' && input.Tiendas && input.Tiendas.length > 0
+          ? input.Tiendas
+          : undefined,
     });
+
     return UserMapper.toDto(entity);
   }
 }
 export { USER_REPO };
-

@@ -1,16 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { USER_REPO } from '../tokens';
 import { UserRepositoryPort } from '@domain/users/user.repository.port';
 import { UserMapper } from '../mappers/user.mapper';
 import { UserDto } from '../dto/user.dto';
-import { USER_REPO } from '../tokens';
 
 @Injectable()
-export class GetUserUseCase {
+export class SearchUsersUseCase {
   constructor(@Inject(USER_REPO) private readonly repo: UserRepositoryPort) {}
 
-  async execute(id: string): Promise<UserDto> {
-    const u = await this.repo.findById(id);
-    if (!u) throw new Error('UserNotFound');
-    return UserMapper.toDto(u);
+  async execute(term: string): Promise<UserDto[]> {
+    const list = await this.repo.search(term);
+    return list.map(UserMapper.toDto);
   }
 }
