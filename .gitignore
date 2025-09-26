@@ -1,11 +1,43 @@
 # Dependencias
 node_modules/
 
+# Archivos de logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
+# Archivos de entorno
+#.env
+.env.*.local
 
 # Directorios de build
 dist/
 build/
 .out/
 
+# Archivos de cache
+.cache/
+.next/
+.nuxt/
+.svelte-kit/
+.astro/
 
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de IDE/Editor
+.vscode/
+.idea/
+*.swp
+
+# Archivos de pruebas y cobertura
+coverage/
+*.lcov
+
+# Archivos temporales
+*.tmp
+*.temp
