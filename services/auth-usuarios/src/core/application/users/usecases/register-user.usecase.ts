@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { UserRepositoryPort } from '@domain/users/user.repository.port';
 import { PasswordHasherPort } from '@domain/security/password-hasher.port';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -11,6 +12,7 @@ export class RegisterUserUseCase {
   constructor(
     @Inject(USER_REPO) private readonly repo: UserRepositoryPort,
     @Inject(PASSWORD_HASHER) private readonly hasher: PasswordHasherPort,
+    @Inject('NOTIFICATIONS_SERVICE') private readonly client: ClientProxy,
   ) {}
 
   async execute(input: CreateUserDto): Promise<UserDto> {
@@ -33,14 +35,20 @@ export class RegisterUserUseCase {
       Pais: input.Pais,
       CodigoPostal: input.CodigoPostal,
       Referencia: input.Referencia,
-      // Solo crea Tiendas si el rol es Vendedor y realmente vienen datos
       Tiendas:
-        input.Rol === 'Vendedor' && input.Tiendas && input.Tiendas.length > 0
+        input.Rol === 'Vendedor' && input.Tiendas?.length
           ? input.Tiendas
           : undefined,
+    });
+
+    // Publicación de evento en RabbitMQ
+    this.client.emit('user.created', {
+      email: entity.email,
+      name: entity.PrimerNombre,
     });
 
     return UserMapper.toDto(entity);
   }
 }
 export { USER_REPO };
+
