@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
+import { ClientsModule, Transport } from '@nestjs/microservices';   
 
 import { UsersController } from './users.controller';
 import { AuthController } from './auth.controller';
@@ -32,6 +33,17 @@ import { USER_REPO, PASSWORD_HASHER, TOKEN_SIGNER, STORE_REPO } from '@app/users
     JwtModule.register({
       secret: (process.env.JWT_SECRET || 'changeme').trim(),
     }),
+    ClientsModule.register([
+      {
+        name: 'NOTIFICATIONS_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://guest:guest@localhost:5672'],
+          queue: 'notifications_queue',
+          queueOptions: { durable: true },
+        },
+      },
+    ]),
   ],
   controllers: [AuthController, UsersController, StoresController],
   providers: [

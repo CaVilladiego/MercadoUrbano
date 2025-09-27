@@ -9,11 +9,14 @@ async function bootstrap() {
   console.log('DB URL:', process.env.DATABASE_URL);
   const app = await NestFactory.create(AppModule);
 
+  // Prefijo global de la API
   app.setGlobalPrefix('api');
+  
+  // Configuración global de validación
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
     forbidNonWhitelisted: true,
-    transform: true,                               // 👈 importante
+    transform: true,              
     transformOptions: { enableImplicitConversion: true },
   }));
 
