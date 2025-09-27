@@ -1,6 +1,8 @@
 version: "3.9"
+
 services:
-  db:
+  # Base de datos para auth-usuarios
+  db-auth:
     image: postgres:16
     environment:
       POSTGRES_USER: mu
@@ -9,13 +11,65 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - mu_db:/var/lib/postgresql/data
+      - db_auth_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U mu -d mercadourbano"]
       interval: 5s
       timeout: 5s
       retries: 20
 
+  # Base de datos para recomendaciones
+  db-recomendaciones:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: mu
+      POSTGRES_PASSWORD: mu
+      POSTGRES_DB: recomendaciones
+    ports:
+      - "5433:5432"     # <- puerto diferente
+    volumes:
+      - db_recomendaciones_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mu -d recomendaciones"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Base de datos para catálogo de productos
+  db-catalogo:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: mu
+      POSTGRES_PASSWORD: mu
+      POSTGRES_DB: catalogo_productos
+    ports:
+      - "5434:5432"
+    volumes:
+      - db_catalogo_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mu -d catalogo_productos"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Base de datos para pedidos
+  db-pedidos:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: mu
+      POSTGRES_PASSWORD: mu
+      POSTGRES_DB: pedidos
+    ports:
+      - "5435:5432"
+    volumes:
+      - db_pedidos_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mu -d pedidos"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # RabbitMQ
   rabbitmq:
     image: rabbitmq:3-management
     ports:
@@ -23,4 +77,7 @@ services:
       - "15672:15672"
 
 volumes:
-  mu_db:
+  db_auth_data:
+  db_recomendaciones_data:
+  db_catalogo_data:
+  db_pedidos_data:
