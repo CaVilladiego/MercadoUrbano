@@ -34,7 +34,17 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
-
+      
+  api-recomendaciones:
+    build: ./recomendaciones
+    environment:
+      DATABASE_URL: postgres://mu:mu@db-recomendaciones:5432/recomendaciones
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+    depends_on:
+      db-recomendaciones:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
   # Base de datos para catálogo de productos
   db-catalogo:
     image: postgres:16

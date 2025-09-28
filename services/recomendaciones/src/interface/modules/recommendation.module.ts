@@ -1,29 +1,25 @@
-// src/core/interface/recommendation.module.ts
+// recommendation.module.ts
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { RecommendationController } from '../controllers/recommendation.controller';
+import { PrismaRecommendationRepository } from '../../core/domain/repositories/prisma-recommendation.repository';
+import { CreateRecommendationUseCase } from '../../core/application/use-cases/create-recommendation.usecase';
+import { GetAllRecommendationsUseCase } from '../../core/application/use-cases/get-all-recommendations.usecase';
 import { PrismaService } from '../../infrastructure/prisma/prisma.service';
-import { RecommendationPrismaRepository } from '../../infrastructure/prisma/recommendation.prisma.repository';
-import { RecommendationRepository } from '../../core/domain/repositories/recommendation.repository';
-
-import { GetRecommendationsUseCase } from '../../core/application/use-cases/get-recommendations.usecase';
-
 import { GeminiService } from '../../infrastructure/ai/gemini.service';
-import { RecommendationsController } from '../controllers/recommendations.controller';
 
 @Module({
-  controllers: [RecommendationsController],
+  imports: [ConfigModule.forRoot({ isGlobal: true })], // hacer global evita problemas con GeminiService
+  controllers: [RecommendationController],
   providers: [
     PrismaService,
     GeminiService,
-
-    // Casos de uso
-    GetRecommendationsUseCase,
-
-    // Inversión de dependencias: enlazamos interfaz con implementación
     {
-      provide: RecommendationRepository,
-      useClass: RecommendationPrismaRepository,
+      provide: 'IRecommendationRepository',
+      useClass: PrismaRecommendationRepository,
     },
+    CreateRecommendationUseCase,
+    GetAllRecommendationsUseCase,
   ],
-  exports: [GetRecommendationsUseCase],
 })
 export class RecommendationModule {}
