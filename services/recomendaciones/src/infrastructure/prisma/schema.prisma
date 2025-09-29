@@ -1,0 +1,17 @@
+// schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // o "mysql" / "sqlite" según tu BD
+  url      = env("DATABASE_URL")
+}
+
+model Recommendation {
+  id          String   @id @default(cuid())
+  userId      String   // ID de usuario (lo provee otro microservicio)
+  sedes    Json     // Lista de recomendadas [{idsede, distancia}]
+  promptUsed  String   // Prompt usado para generar la recomendación
+  createdAt   DateTime @default(now())
+}
