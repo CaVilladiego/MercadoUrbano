@@ -1,10 +1,14 @@
-import { ProductRepository } from '../../domain/repositories/product.repository.port';
+import { Injectable, Inject } from '@nestjs/common';
+import type { ProductRepository } from '../../domain/repositories/product.repository.port';
 import { Product } from '../../domain/entities/product.entity';
 
+@Injectable()
 export class GetProductUseCase {
-  constructor(private readonly userRepo: ProductRepository) {}
+  constructor(
+    @Inject('ProductRepository') private readonly productRepo: ProductRepository
+  ) {}
 
   async execute(id: string): Promise<Product | null> {
-    return this.userRepo.findById(id);
+    return this.productRepo.findById(id);
   }
 }

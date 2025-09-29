@@ -18,7 +18,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document); // Swagger UI at /api/docs
 
-  const port = 3000;
+  const port = 3004;
   await app.listen(port);
 
   console.log(`Productos Catálogo corriendo en http://localhost:${port}/api`);
