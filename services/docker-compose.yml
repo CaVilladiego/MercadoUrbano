@@ -51,6 +51,16 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
+      
+  catalogo-productos:
+    build: ./catalogo-productos
+    ports:
+      - "3004:3004"
+    volumes:
+      - ./catalogo-productos:/app  
+      - /app/node_modules          
+    env_file:
+      - ./catalogo-productos/.env
 
   # Base de datos para pedidos
   db-pedidos:
