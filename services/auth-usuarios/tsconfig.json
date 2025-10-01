@@ -16,8 +16,9 @@
       "@app/*": ["core/application/*"],
       "@infra/*": ["infrastructure/*"],
       "@interface/*": ["interface/*"]
-    }
+    },
+    "types": ["node", "jest"]
   },
-  "include": ["src"],
+  "include": ["src", "test"],   
   "exclude": ["node_modules", "dist"]
 }

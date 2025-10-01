@@ -9,14 +9,14 @@ export interface UserRepositoryPort {
     Apellido: string;
     Telefono: string;
     Rol?: 'Cliente' | 'Vendedor' | 'Administrador';
-    // Dirección principal (⚠️ Direccion)
+    // Dirección principal
     Direccion: string;
     Ciudad: string;
     Departamento: string;
     Pais: string;
     CodigoPostal?: string | null;
     Referencia?: string | null;
-    // Tiendas del vendedor (⚠️ Tiendas)
+    // Tiendas del vendedor
     Tiendas?: Array<{
       name: string;
       telefono: string;
