@@ -34,7 +34,7 @@ export class StoresController {
     return this.listByOwner.execute(ownerId);
   }
 
-  @Get()
+  @Get("/all")
   @ApiOperation({ summary: "Listar todas las sedes" })
   async listAll() {
     return this.listStoresUseCase.execute();

@@ -2,9 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { StoreRepositoryPort } from "@domain/stores/store.repository.port";
 import { StoreMapper } from "../mappers/store.mapper";
 import { StoreDto } from "../dto/store.dto";
-
-// Define el mismo token que uses en tu módulo (similar a USER_REPO)
-export const STORE_REPO = "STORE_REPO";
+import { STORE_REPO } from "@app/users/tokens";
 
 @Injectable()
 export class ListStoresUseCase {
