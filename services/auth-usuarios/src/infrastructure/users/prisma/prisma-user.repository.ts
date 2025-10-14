@@ -93,8 +93,8 @@ export class PrismaUserRepository implements UserRepositoryPort {
       u.id, u.email, u.passwordHash,
       u.PrimerNombre, u.SegundoNombre, u.Apellido, u.Telefono, u.Rol,
       u.isActive, u.createdAt, u.updatedAt,
-      address?.Direccion ?? null,
-      address?.Ciudad ?? null
+      address?.Direccion ?? '',
+      address?.Ciudad ?? ''
     );
   }
 
@@ -115,8 +115,8 @@ export class PrismaUserRepository implements UserRepositoryPort {
         u.id, u.email, u.passwordHash,
         u.PrimerNombre, u.SegundoNombre, u.Apellido, u.Telefono, u.Rol,
         u.isActive, u.createdAt, u.updatedAt,
-        address?.Direccion ?? null,
-        address?.Ciudad ?? null
+        address?.Direccion ?? '',
+        address?.Ciudad ?? ''
       );
     });
   }
@@ -183,8 +183,8 @@ export class PrismaUserRepository implements UserRepositoryPort {
       u.id, u.email, u.passwordHash,
       u.PrimerNombre, u.SegundoNombre, u.Apellido, u.Telefono, u.Rol,
       u.isActive, u.createdAt, u.updatedAt,
-      address?.Direccion ?? null,
-      address?.Ciudad ?? null
+      address?.Direccion ?? '',
+      address?.Ciudad ?? ''
     );
   }
 
@@ -228,8 +228,8 @@ export class PrismaUserRepository implements UserRepositoryPort {
         u.id, u.email, u.passwordHash,
         u.PrimerNombre, u.SegundoNombre, u.Apellido, u.Telefono, u.Rol,
         u.isActive, u.createdAt, u.updatedAt,
-        address?.Direccion ?? null,
-        address?.Ciudad ?? null
+        address?.Direccion ?? '',
+        address?.Ciudad ?? ''
       );
     });
   }
