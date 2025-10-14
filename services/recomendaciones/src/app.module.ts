@@ -3,7 +3,6 @@ import { ConfigModule } from '@nestjs/config';
 import { RecommendationModule } from './interface/modules/recommendation.module';
 import { RecommendationController } from './interface/controllers/recommendation.controller';
 import { PrismaService } from './infrastructure/prisma/prisma.service';
-import { RecommendationPrismaRepository } from './infrastructure/prisma/recommendation.prisma.repository';
 import { GeminiService } from './infrastructure/ai/gemini.service';
 
 @Module({
@@ -14,6 +13,6 @@ import { GeminiService } from './infrastructure/ai/gemini.service';
     RecommendationModule,
   ],
   controllers: [],
-  providers: [PrismaService, RecommendationPrismaRepository, GeminiService],
+  providers: [PrismaService, GeminiService],
 })
 export class AppModule {}

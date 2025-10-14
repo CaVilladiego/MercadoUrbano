@@ -1,9 +1,9 @@
-export class Recommendation {
+export class RecommendationEntity {
   constructor(
-    public id: string,
-    public userId: string,
-    public sedes: any,
-    public promptUsed: string,
-    public createdAt: Date,
+    public readonly id: string,
+    public readonly userId: string,
+    public readonly sedes: any[], // [{ idSede, distancia }]
+    public readonly promptUsed: string,
+    public readonly createdAt: Date,
   ) {}
 }

@@ -1,10 +1,11 @@
 // controllers/recommendation.controller.ts
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CreateRecommendationDto } from '../../core/application/dto/create-recommendation.dto';
 import { RecommendationResponseDto } from '../../core/application/dto/recomendation-response.dto';
 import { CreateRecommendationUseCase } from '../../core/application/use-cases/create-recommendation.usecase';
 import { GetAllRecommendationsUseCase } from '../../core/application/use-cases/get-all-recommendations.usecase';
+import { RecommendNearbyStoresUseCase } from '../../core/application/use-cases/recommend-nearby-stores.usecase';
 
 @ApiTags('Recommendations')
 @Controller('recommendations')
@@ -12,6 +13,7 @@ export class RecommendationController {
   constructor(
     private createUseCase: CreateRecommendationUseCase,
     private getAllUseCase: GetAllRecommendationsUseCase,
+    private readonly recommendUseCase: RecommendNearbyStoresUseCase,
   ) {}
 
   @Post()
@@ -36,5 +38,10 @@ export class RecommendationController {
   })
   getAll(): Promise<RecommendationResponseDto[]> {
     return this.getAllUseCase.execute();
+  }
+  @Post(':userId')
+  @ApiOperation({ summary: 'Generar recomendaciones de sedes cercanas' })
+  async generate(@Param('userId') userId: string) {
+    return this.recommendUseCase.execute(userId);
   }
 }
