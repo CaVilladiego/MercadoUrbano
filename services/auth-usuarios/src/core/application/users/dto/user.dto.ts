@@ -11,4 +11,6 @@ export class UserDto {
   @ApiProperty() isActive!: boolean;
   @ApiProperty() createdAt!: Date;
   @ApiProperty() updatedAt!: Date;
+  @ApiProperty() Direccion!: string;
+  @ApiProperty() Ciudad!: string;
 }

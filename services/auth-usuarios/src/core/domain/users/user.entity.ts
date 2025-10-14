@@ -14,5 +14,8 @@ export class UserEntity {
     public readonly isActive: boolean,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
+
+    public readonly Direccion: string,
+    public readonly Ciudad: string,
   ) {}
 }
