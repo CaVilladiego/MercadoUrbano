@@ -15,6 +15,8 @@ export class UserMapper {
     dto.isActive = u.isActive;
     dto.createdAt = u.createdAt;
     dto.updatedAt = u.updatedAt;
+    dto.Direccion = u.Direccion;
+    dto.Ciudad = u.Ciudad;
 
     return dto;
   }

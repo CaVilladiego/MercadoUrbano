@@ -58,7 +58,8 @@ export class PrismaUserRepository implements UserRepositoryPort {
     return new UserEntity(
       u.id, u.email, u.passwordHash,
       u.PrimerNombre, u.SegundoNombre, u.Apellido, u.Telefono, u.Rol,
-      u.isActive, u.createdAt, u.updatedAt
+      u.isActive, u.createdAt, u.updatedAt,
+      '', ''
     );
   }
 
@@ -68,29 +69,56 @@ export class PrismaUserRepository implements UserRepositoryPort {
       ? new UserEntity(
           u.id, u.email, u.passwordHash,
           u.PrimerNombre, u.SegundoNombre, u.Apellido, u.Telefono, u.Rol,
-          u.isActive, u.createdAt, u.updatedAt
+          u.isActive, u.createdAt, u.updatedAt,
+          '', ''
         )
       : null;
   }
 
   async findById(id: string): Promise<UserEntity | null> {
-    const u = await this.prisma.user.findUnique({ where: { id } });
-    return u
-      ? new UserEntity(
-          u.id, u.email, u.passwordHash,
-          u.PrimerNombre, u.SegundoNombre, u.Apellido, u.Telefono, u.Rol,
-          u.isActive, u.createdAt, u.updatedAt
-        )
-      : null;
+    const u = await this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        addresses: {
+          where: { isPrimary: true },
+          take: 1,
+        },
+      },
+    });
+
+    if (!u) return null;
+
+    const address = u.addresses[0];
+    return new UserEntity(
+      u.id, u.email, u.passwordHash,
+      u.PrimerNombre, u.SegundoNombre, u.Apellido, u.Telefono, u.Rol,
+      u.isActive, u.createdAt, u.updatedAt,
+      address?.Direccion ?? null,
+      address?.Ciudad ?? null
+    );
   }
 
   async list(): Promise<UserEntity[]> {
-    const arr = await this.prisma.user.findMany({ orderBy: { createdAt: 'desc' } });
-    return arr.map(u => new UserEntity(
-      u.id, u.email, u.passwordHash,
-      u.PrimerNombre, u.SegundoNombre, u.Apellido, u.Telefono, u.Rol,
-      u.isActive, u.createdAt, u.updatedAt
-    ));
+    const arr = await this.prisma.user.findMany({
+      include: {
+        addresses: {
+          where: { isPrimary: true },
+          take: 1,
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return arr.map(u => {
+      const address = u.addresses[0];
+      return new UserEntity(
+        u.id, u.email, u.passwordHash,
+        u.PrimerNombre, u.SegundoNombre, u.Apellido, u.Telefono, u.Rol,
+        u.isActive, u.createdAt, u.updatedAt,
+        address?.Direccion ?? null,
+        address?.Ciudad ?? null
+      );
+    });
   }
 
   async update(
@@ -100,12 +128,12 @@ export class PrismaUserRepository implements UserRepositoryPort {
     const { password, ...rest } = data as any;
     const updateData: any = { ...rest };
 
-    // ✅ manejar password -> passwordHash
+    // manejar password -> passwordHash
     if (password) {
       updateData.passwordHash = await this.bcrypt.hash(password);
     }
 
-    // ✅ manejar dirección si viene como campos planos
+    // manejar dirección si viene como campos planos
     if ((rest as any).Direccion) {
       updateData.addresses = {
         create: [{
@@ -126,7 +154,7 @@ export class PrismaUserRepository implements UserRepositoryPort {
       delete updateData.Referencia;
     }
 
-    // ✅ manejar Tiendas si vienen
+    // manejar Tiendas si vienen
     if ((rest as any).Tiendas) {
       updateData.Tiendas = {
         create: (rest as any).Tiendas.map((t: any) => ({
@@ -142,17 +170,26 @@ export class PrismaUserRepository implements UserRepositoryPort {
     const u = await this.prisma.user.update({
       where: { id },
       data: updateData,
+      include: {
+        addresses: {
+          where: { isPrimary: true },
+          take: 1,
+        },
+      },
     });
 
+    const address = u.addresses[0];
     return new UserEntity(
       u.id, u.email, u.passwordHash,
       u.PrimerNombre, u.SegundoNombre, u.Apellido, u.Telefono, u.Rol,
-      u.isActive, u.createdAt, u.updatedAt
+      u.isActive, u.createdAt, u.updatedAt,
+      address?.Direccion ?? null,
+      address?.Ciudad ?? null
     );
   }
 
   async delete(id: string): Promise<UserEntity> {
-    // ✅ eliminar direcciones en cascada para evitar error de foreign key
+    // eliminar direcciones en cascada para evitar error de foreign key
     await this.prisma.address.deleteMany({ where: { userId: id } });
     await this.prisma.store.deleteMany({ where: { ownerId: id } });
 
@@ -160,7 +197,8 @@ export class PrismaUserRepository implements UserRepositoryPort {
     return new UserEntity(
       u.id, u.email, u.passwordHash,
       u.PrimerNombre, u.SegundoNombre, u.Apellido, u.Telefono, u.Rol,
-      u.isActive, u.createdAt, u.updatedAt
+      u.isActive, u.createdAt, u.updatedAt,
+      '', ''
     );
   }
 
@@ -171,16 +209,28 @@ export class PrismaUserRepository implements UserRepositoryPort {
           { email: { contains: term, mode: 'insensitive' } },
           { PrimerNombre: { contains: term, mode: 'insensitive' } },
           { SegundoNombre: { contains: term, mode: 'insensitive' } },
-          { Apellido:  { contains: term, mode: 'insensitive' } },
-          { Telefono:  { contains: term, mode: 'insensitive' } },
+          { Apellido: { contains: term, mode: 'insensitive' } },
+          { Telefono: { contains: term, mode: 'insensitive' } },
         ],
+      },
+      include: {
+        addresses: {
+          where: { isPrimary: true },
+          take: 1,
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
-    return arr.map(u => new UserEntity(
-      u.id, u.email, u.passwordHash,
-      u.PrimerNombre, u.SegundoNombre, u.Apellido, u.Telefono, u.Rol,
-      u.isActive, u.createdAt, u.updatedAt
-    ));
+
+    return arr.map(u => {
+      const address = u.addresses[0];
+      return new UserEntity(
+        u.id, u.email, u.passwordHash,
+        u.PrimerNombre, u.SegundoNombre, u.Apellido, u.Telefono, u.Rol,
+        u.isActive, u.createdAt, u.updatedAt,
+        address?.Direccion ?? null,
+        address?.Ciudad ?? null
+      );
+    });
   }
 }

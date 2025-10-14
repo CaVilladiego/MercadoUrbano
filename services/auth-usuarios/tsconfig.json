@@ -5,7 +5,7 @@
     "declaration": true,
     "sourceMap": true,
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": ".",                        
     "strict": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -17,8 +17,9 @@
       "@infra/*": ["infrastructure/*"],
       "@interface/*": ["interface/*"]
     },
-    "types": ["node", "jest"]
+    "types": ["node", "jest"],
+    "ignoreDeprecations": "6.0"           
   },
-  "include": ["src", "test"],   
+  "include": ["src", "test"],              
   "exclude": ["node_modules", "dist"]
 }
