@@ -18,7 +18,17 @@ export class RecommendNearbyStoresUseCase {
     const stores = await this.usersApi.listAllStores();
 
     const address =
-      user.addresses?.find((a: any) => a.isPrimary) || user.addresses?.[0];
+      user.addresses?.find((a: any) => a.isPrimary) ||
+      user.addresses?.[0] ||
+      (user.Direccion
+        ? {
+            Direccion: user.Direccion,
+            Ciudad: user.Ciudad,
+            Departamento: user.Departamento ?? 'Sin especificar',
+            Pais: user.Pais ?? 'Sin especificar',
+          }
+        : null);
+
     if (!address) throw new Error('El usuario no tiene dirección registrada.');
 
     const prompt = `
@@ -28,8 +38,7 @@ Eres un asistente que recomienda sedes según cercanía geográfica.
 - Nombre: ${user.PrimerNombre} ${user.Apellido}
 - Ciudad: ${address.Ciudad}
 - Dirección: ${address.Direccion}
-- Departamento: ${address.Departamento}
-- País: ${address.Pais}
+
 
 🏢 Sedes disponibles:
 ${stores
@@ -48,6 +57,7 @@ No incluyas texto fuera del JSON.
 `;
 
     const text = await this.gemini.generateText(prompt);
+    console.log('🔹 GEMINI RESPONSE:', text);
 
     const match = text.match(/\[.*\]/s);
     if (!match) throw new Error('Respuesta inválida de Gemini');

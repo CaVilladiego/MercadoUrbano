@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { StoreRepositoryPort } from '@domain/stores/store.repository.port';
-import { StoreEntity } from '@domain/stores/store.entity';
-import { PrismaService } from '@infra/users/prisma/prisma.service';
+import { Injectable } from "@nestjs/common";
+import { StoreRepositoryPort } from "@domain/stores/store.repository.port";
+import { StoreEntity } from "@domain/stores/store.entity";
+import { PrismaService } from "@infra/users/prisma/prisma.service";
 
 @Injectable()
 export class PrismaStoreRepository implements StoreRepositoryPort {
@@ -25,14 +25,14 @@ export class PrismaStoreRepository implements StoreRepositoryPort {
         ownerId: data.ownerId,
         name: data.name,
         telefono: data.telefono,
-        email: data.email,
-        description: data.description,
+        email: data.email ?? null,
+        description: data.description ?? null,
         direccion: data.direccion,
         ciudad: data.ciudad,
         departamento: data.departamento,
         pais: data.pais,
-        codigoPostal: data.codigoPostal,
-        referencia: data.referencia,
+        codigoPostal: data.codigoPostal ?? null,
+        referencia: data.referencia ?? null,
       },
     });
 
@@ -41,14 +41,14 @@ export class PrismaStoreRepository implements StoreRepositoryPort {
       s.ownerId,
       s.name,
       s.telefono,
-      s.description,
-      s.email,
+      s.description ?? null,
+      s.email ?? null,
       s.direccion,
       s.ciudad,
       s.departamento,
       s.pais,
-      s.codigoPostal,
-      s.referencia,
+      s.codigoPostal ?? null,
+      s.referencia ?? null,
       s.isActive,
       s.createdAt,
       s.updatedAt
@@ -57,44 +57,45 @@ export class PrismaStoreRepository implements StoreRepositoryPort {
 
   async findById(id: string): Promise<StoreEntity | null> {
     const s = await this.prisma.store.findUnique({ where: { id } });
-    return s
-      ? new StoreEntity(
-          s.id,
-          s.ownerId,
-          s.name,
-          s.telefono,
-          s.description,
-          s.email,
-          s.direccion,
-          s.ciudad,
-          s.departamento,
-          s.pais,
-          s.codigoPostal,
-          s.referencia,
-          s.isActive,
-          s.createdAt,
-          s.updatedAt
-        )
-      : null;
+    if (!s) return null;
+
+    return new StoreEntity(
+      s.id,
+      s.ownerId,
+      s.name,
+      s.telefono,
+      s.description ?? null,
+      s.email ?? null,
+      s.direccion,
+      s.ciudad,
+      s.departamento,
+      s.pais,
+      s.codigoPostal ?? null,
+      s.referencia ?? null,
+      s.isActive,
+      s.createdAt,
+      s.updatedAt
+    );
   }
 
   async findByOwner(ownerId: string): Promise<StoreEntity[]> {
     const arr = await this.prisma.store.findMany({ where: { ownerId } });
+
     return arr.map(
-      s =>
+      (s) =>
         new StoreEntity(
           s.id,
           s.ownerId,
           s.name,
           s.telefono,
-          s.description,
-          s.email,
+          s.description ?? null,
+          s.email ?? null,
           s.direccion,
           s.ciudad,
           s.departamento,
           s.pais,
-          s.codigoPostal,
-          s.referencia,
+          s.codigoPostal ?? null,
+          s.referencia ?? null,
           s.isActive,
           s.createdAt,
           s.updatedAt
@@ -103,22 +104,25 @@ export class PrismaStoreRepository implements StoreRepositoryPort {
   }
 
   async list(): Promise<StoreEntity[]> {
-    const arr = await this.prisma.store.findMany({ orderBy: { createdAt: 'desc' } });
+    const arr = await this.prisma.store.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+
     return arr.map(
-      s =>
+      (s) =>
         new StoreEntity(
           s.id,
           s.ownerId,
           s.name,
           s.telefono,
-          s.description,
-          s.email,
+          s.description ?? null,
+          s.email ?? null,
           s.direccion,
           s.ciudad,
           s.departamento,
           s.pais,
-          s.codigoPostal,
-          s.referencia,
+          s.codigoPostal ?? null,
+          s.referencia ?? null,
           s.isActive,
           s.createdAt,
           s.updatedAt
@@ -128,22 +132,23 @@ export class PrismaStoreRepository implements StoreRepositoryPort {
 
   async update(
     id: string,
-    data: Partial<Omit<StoreEntity, 'id' | 'createdAt' | 'updatedAt'>>
+    data: Partial<Omit<StoreEntity, "id" | "createdAt" | "updatedAt">>
   ): Promise<StoreEntity> {
     const s = await this.prisma.store.update({ where: { id }, data });
+
     return new StoreEntity(
       s.id,
       s.ownerId,
       s.name,
       s.telefono,
-      s.description,
-      s.email,
+      s.description ?? null,
+      s.email ?? null,
       s.direccion,
       s.ciudad,
       s.departamento,
       s.pais,
-      s.codigoPostal,
-      s.referencia,
+      s.codigoPostal ?? null,
+      s.referencia ?? null,
       s.isActive,
       s.createdAt,
       s.updatedAt
@@ -152,19 +157,20 @@ export class PrismaStoreRepository implements StoreRepositoryPort {
 
   async delete(id: string): Promise<StoreEntity> {
     const s = await this.prisma.store.delete({ where: { id } });
+
     return new StoreEntity(
       s.id,
       s.ownerId,
       s.name,
       s.telefono,
-      s.description,
-      s.email,
+      s.description ?? null,
+      s.email ?? null,
       s.direccion,
       s.ciudad,
       s.departamento,
       s.pais,
-      s.codigoPostal,
-      s.referencia,
+      s.codigoPostal ?? null,
+      s.referencia ?? null,
       s.isActive,
       s.createdAt,
       s.updatedAt
