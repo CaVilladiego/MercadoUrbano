@@ -1,0 +1,15 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "../",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "testEnvironment": "node",
+  "moduleNameMapper": {
+    "^@app/(.*)$": "<rootDir>/src/core/application/$1",
+    "^@domain/(.*)$": "<rootDir>/src/core/domain/$1",
+    "^@infra/(.*)$": "<rootDir>/src/infrastructure/$1",
+    "^@interface/(.*)$": "<rootDir>/src/interface/$1"
+  }
+}
