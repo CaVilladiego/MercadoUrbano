@@ -8,9 +8,6 @@ RUN npm install
 
 COPY . .
 
-# Generar Prisma si tu microservicio lo usa (sino, puedes omitir esta línea)
-# RUN npx prisma generate --schema=src/infrastructure/prisma/schema.prisma
-
 RUN npm run build
 
 # Etapa 2: runtime
