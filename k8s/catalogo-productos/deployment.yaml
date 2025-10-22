@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalogo-productos
+  namespace: mercadourbano
+  labels:
+    app: catalogo-productos
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: catalogo-productos
+  template:
+    metadata:
+      labels:
+        app: catalogo-productos
+    spec:
+      containers:
+        - name: catalogo-productos
+          image: <your-registry>/catalogo-productos:latest
+          ports:
+            - containerPort: 3004
+          env:
+            - name: DATABASE_URL
+              value: "postgresql://mu:mu@db-catalogo:5432/catalogo_productos"
+            - name: NODE_ENV
+              value: "production"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: global-secrets
+                  key: JWT_SECRET
+            - name: PORT
+              value: "3004"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3004
+            initialDelaySeconds: 5
+            periodSeconds: 10
