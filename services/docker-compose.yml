@@ -82,7 +82,7 @@ services:
       db-recomendaciones:
         condition: service_healthy
     ports:
-      - "3000:3000"
+      - "3000:3001"
 
   # Base de datos para catálogo de productos
   db-catalogo:
