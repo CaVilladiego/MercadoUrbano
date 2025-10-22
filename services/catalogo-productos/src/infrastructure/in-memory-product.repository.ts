@@ -13,7 +13,7 @@ export class InMemoryProductRepository implements ProductRepository {
 
   // Find a product by ID
   async findById(id: string): Promise<Product | null> {
-    const product = this.products.find(p => p.id === id);
+    const product = this.products.find(p => p.id_producto === id);
     return product || null;
   }
 

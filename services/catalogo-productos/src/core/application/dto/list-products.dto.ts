@@ -14,10 +14,10 @@ export class ProductDto {
   descripcion: string;
 
   @ApiProperty({ description: 'Precio del producto' })
-  precio: string;
+  precio: number;
 
   @ApiProperty({ description: 'Cantidad del producto en stock del vendedor' })
-  stock: string;
+  stock: number;
 
   @ApiProperty({ description: 'Estado del producto' })
   estado: string;

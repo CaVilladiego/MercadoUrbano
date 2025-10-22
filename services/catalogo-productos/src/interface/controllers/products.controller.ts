@@ -9,11 +9,11 @@ import { Product } from 'src/core/domain/entities/product.entity';
 
 function toProductDto(product: Product): ProductDto {
   return {
-    id_producto: product.id,
-    id_vendedor: product.id,
-    nombre: product.name,
-    descripcion: product.description,
-    precio: product.price,
+    id_producto: product.id_producto,
+    id_vendedor: product.id_vendedor,
+    nombre: product.nombre,
+    descripcion: product.descripcion,
+    precio: product.precio,
     stock: product.stock,
     estado: product.estado,
   };
