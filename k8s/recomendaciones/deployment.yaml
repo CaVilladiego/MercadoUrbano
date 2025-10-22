@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recomendaciones
+  namespace: mercadourbano
+  labels:
+    app: recomendaciones
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recomendaciones
+  template:
+    metadata:
+      labels:
+        app: recomendaciones
+    spec:
+      containers:
+        - name: recomendaciones
+          image: <your-registry>/recomendaciones:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DATABASE_URL
+              value: "postgresql://mu:mu@db-recomendaciones:5432/recomendaciones"
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: global-secrets
+                  key: GEMINI_API_KEY
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10

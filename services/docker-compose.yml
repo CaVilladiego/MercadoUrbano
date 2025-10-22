@@ -18,6 +18,42 @@ services:
       timeout: 5s
       retries: 20
 
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  # Microservicio auth-usuarios
+  auth-usuarios:
+    build: ./auth-usuarios
+    container_name: auth-usuarios
+    environment:
+      DATABASE_URL: postgres://mu:mu@db-auth:5432/mercadourbano
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      NODE_ENV: production
+    depends_on:
+      db-auth:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    ports:
+      - "3001:3001"
+
+  # Microservicio notificaciones
+  notificaciones:
+    build: ./notificaciones
+    container_name: notificaciones
+    environment:
+      NODE_ENV: production
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_started
+    ports:
+      - "3002:3002"
+
   # Base de datos para recomendaciones
   db-recomendaciones:
     image: postgres:16
@@ -26,7 +62,7 @@ services:
       POSTGRES_PASSWORD: mu
       POSTGRES_DB: recomendaciones
     ports:
-      - "5433:5432"     # <- puerto diferente
+      - "5433:5432"
     volumes:
       - db_recomendaciones_data:/var/lib/postgresql/data
     healthcheck:
@@ -34,7 +70,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
-      
+
+  # API de recomendaciones
   api-recomendaciones:
     build: ./recomendaciones
     env_file:
@@ -63,14 +100,15 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
-      
+
+  # API de catálogo
   catalogo-productos:
     build: ./catalogo-productos
     ports:
       - "3004:3004"
     volumes:
-      - ./catalogo-productos:/app  
-      - /app/node_modules          
+      - ./catalogo-productos:/app
+      - /app/node_modules
     env_file:
       - ./catalogo-productos/.env
 
@@ -90,13 +128,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
-
-  # RabbitMQ
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
 
 volumes:
   db_auth_data:

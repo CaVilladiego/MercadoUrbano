@@ -53,13 +53,20 @@ export class PrismaUserRepository implements UserRepositoryPort {
             }
           : {}),
       },
+      include: {
+        addresses:{
+          where: { isPrimary: true },
+          take: 1,
+        }
+      }
     });
-
+    const address = u.addresses[0];
     return new UserEntity(
       u.id, u.email, u.passwordHash,
       u.PrimerNombre, u.SegundoNombre, u.Apellido, u.Telefono, u.Rol,
       u.isActive, u.createdAt, u.updatedAt,
-      '', ''
+      address?.Direccion??  '',
+      address?.Ciudad?? ''
     );
   }
 

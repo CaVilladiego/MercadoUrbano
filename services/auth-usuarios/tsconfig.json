@@ -17,7 +17,7 @@
       "@infra/*": ["infrastructure/*"],
       "@interface/*": ["interface/*"]
     },
-    "types": ["node", "jest"],     
+    "types": ["node", "jest"]          
   },
   "include": ["src", "test"],              
   "exclude": ["node_modules", "dist"]

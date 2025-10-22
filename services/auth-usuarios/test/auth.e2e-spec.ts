@@ -1,73 +1,87 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RegisterUserUseCase } from '../src/core/application/users/usecases/register-user.usecase';
-import { UserRepositoryPort } from '../src/core/domain/users/user.repository.port';
-import { USER_REPO, PASSWORD_HASHER } from '../src/core/application/users/tokens';
-import { PasswordHasherPort } from '../src/core/domain/security/password-hasher.port';
+import { INestApplication } from '@nestjs/common';
+import request from 'supertest';
+import { AppModule } from '../src/app.module';
+import { PrismaService } from '../src/infrastructure/users/prisma/prisma.service';
 import { ClientProxy } from '@nestjs/microservices';
 
-describe('RegisterUserUseCase', () => {
-  let usecase: RegisterUserUseCase;
-  let repo: jest.Mocked<UserRepositoryPort>;
-  let hasher: jest.Mocked<PasswordHasherPort>;
-  let client: jest.Mocked<ClientProxy>;
+describe('AuthUsuarios E2E - Registro', () => {
+  let app: INestApplication;
+  let prisma: PrismaService;
 
-  beforeEach(async () => {
-  const module: TestingModule = await Test.createTestingModule({
-    providers: [
-      RegisterUserUseCase,
-      {
-        provide: USER_REPO,
-        useValue: { create: jest.fn(), findByEmail: jest.fn() },
-      },
-      {
-        provide: PASSWORD_HASHER,
-        useValue: { hash: jest.fn().mockResolvedValue('hashedPassword'), compare: jest.fn() },
-      },
-      {
-        provide: 'NOTIFICATIONS_SERVICE',
-        useValue: { emit: jest.fn(), send: jest.fn(), connect: jest.fn(), close: jest.fn(), on: jest.fn(), status: { subscribe: jest.fn() }, unwrap: jest.fn() },
-      },
-    ],
-  }).compile();
+  // Mock de NOTIFICATIONS_SERVICE para no depender de RabbitMQ real
+  const notificationsMock: Partial<ClientProxy> = {
+    emit: jest.fn(),
+    send: jest.fn(),
+    connect: jest.fn(),
+    close: jest.fn(),
+    on: jest.fn(),
+    unwrap: jest.fn(),
+    // Simulamos el observable status aunque no se use
+    // @ts-expect-error simplificado
+    status: { subscribe: jest.fn() },
+  };
 
-  usecase = module.get(RegisterUserUseCase);
-  repo = module.get(USER_REPO);
-});
+  beforeAll(async () => {
+    // Creamos el módulo de prueba
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      // Sobrescribimos el cliente RabbitMQ con un mock
+      .overrideProvider('NOTIFICATIONS_SERVICE')
+      .useValue(notificationsMock)
+      .compile();
 
-  it('Se registra un usuario con todos los campos requeridos', async () => {
-    repo.findByEmail.mockResolvedValue(null); // No existe previamente
-    repo.create.mockResolvedValue({
-      id: '1',
-      email: 'test@mail.com',
-      PrimerNombre: 'Juan',
-      Apellido: 'Pérez',
-      Telefono: '3001234567',
-      Direccion: 'Calle 123',
-      Ciudad: 'Bogotá',
-      Departamento: 'Cundinamarca',
-      Pais: 'Colombia',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    } as any);
+    app = moduleFixture.createNestApplication();
+    await app.init();
 
-    const result = await usecase.execute({
-      email: 'test@mail.com',
+    prisma = app.get(PrismaService);
+
+    // Limpia la tabla de usuarios antes de empezar
+    try {
+      await prisma.$executeRawUnsafe(`TRUNCATE TABLE "User" RESTART IDENTITY CASCADE;`);
+    } catch {
+      console.log(' Tabla User no encontrada, ignorando limpieza inicial.');
+    }
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it(' debería registrar un usuario correctamente (POST /auth/register)', async () => {
+    const payload = {
+      email: 'integration@test.com',
       password: '123456',
-      PrimerNombre: 'Juan',
-      Apellido: 'Pérez',
-      Telefono: '3001234567',
+      PrimerNombre: 'Integracion',
+      Apellido: 'Prueba',
+      Telefono: '3000000000',
       Direccion: 'Calle 123',
       Ciudad: 'Bogotá',
       Departamento: 'Cundinamarca',
       Pais: 'Colombia',
+    };
+
+    const response = await request(app.getHttpServer())
+      .post('/auth/register')
+      .send(payload)
+      .expect(201);
+
+    expect(response.body).toHaveProperty('id');
+    expect(response.body.email).toBe('integration@test.com');
+
+    // Verificar que se haya guardado en la base de datos
+    const userInDb = await prisma.user.findUnique({
+      where: { email: 'integration@test.com' },
     });
 
-    expect(result).toHaveProperty('id');
-    expect(hasher.hash).toHaveBeenCalledWith('123456');
-    expect(repo.create).toHaveBeenCalled();
-    expect(client.emit).toHaveBeenCalledWith('user.created', {
-      email: 'test@mail.com',
-      name: 'Juan',
+    expect(userInDb).not.toBeNull();
+    expect(userInDb?.PrimerNombre).toBe('Integracion');
+
+    // Verificar que el evento se haya emitido
+    expect(notificationsMock.emit).toHaveBeenCalledWith('user.created', {
+      email: 'integration@test.com',
+      name: 'Integracion',
     });
   });
 });

@@ -14,8 +14,10 @@ export class CreateProductUseCase {
       input.id_vendedor,
       input.nombre,
       input.descripcion,
-      input.precio,
-      input.stock
+      Number(input.precio),
+      Number(input.stock),
+      input.estado
+
     );
 
     if (+product.stock < 0) throw new Error('Stock cannot be negative');
