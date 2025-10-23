@@ -31,6 +31,8 @@ services:
       context: ./auth-usuarios
       dockerfile: Dockerfile
     container_name: auth-usuarios
+    env_file:
+      - ./auth-usuarios/.env
     environment:
       DATABASE_URL: postgres://mu:mu@db-auth:5432/mercadourbano
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
@@ -50,6 +52,8 @@ services:
   notificaciones:
     build: ./notificaciones
     container_name: notificaciones
+    env_file:
+      - ./notificaciones/.env
     environment:
       NODE_ENV: production
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672

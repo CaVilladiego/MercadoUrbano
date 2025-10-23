@@ -12,26 +12,28 @@ async function bootstrap() {
   // Prefijo global de la API
   app.setGlobalPrefix('api');
 
-  // Inicio de Configuración de Swagger
+  // Configuración Swagger
   const config = new DocumentBuilder()
     .setTitle('Notificaciones API')
     .setDescription('Microservicio de notificaciones por email, push o WhatsApp')
     .setVersion('1.0')
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
-  // Fin de Configuración de Swagger
 
+  // Conectar al broker RabbitMQ
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: ['amqp://guest:guest@localhost:5672'],
+      urls: [process.env.RABBITMQ_URL || 'amqp://guest:guest@rabbitmq:5672'],
       queue: 'notifications_queue',
       queueOptions: { durable: true },
     },
   });
 
+  // Iniciar el microservicio y la API HTTP
+  await app.startAllMicroservices();
   const port = parseInt(process.env.PORT || '3002', 10);
   await app.listen(port);
 

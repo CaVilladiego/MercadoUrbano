@@ -1,6 +1,6 @@
-import { Module } from "@nestjs/common";
+import { Module, OnModuleInit, Inject } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
-import { ClientsModule, Transport } from "@nestjs/microservices";
+import { ClientsModule, Transport, ClientProxy } from "@nestjs/microservices";
 
 import { UsersController } from "./users.controller";
 import { AuthController } from "./auth.controller";
@@ -44,7 +44,7 @@ import {
         name: "NOTIFICATIONS_SERVICE",
         transport: Transport.RMQ,
         options: {
-          urls: ["amqp://guest:guest@localhost:5672"],
+          urls: [process.env.RABBITMQ_URL || "amqp://guest:guest@rabbitmq:5672"], // usamos el host del contenedor
           queue: "notifications_queue",
           queueOptions: { durable: true },
         },
@@ -75,4 +75,13 @@ import {
     DeleteStoreUseCase,
   ],
 })
-export class UsersModule {}
+export class UsersModule implements OnModuleInit {
+  constructor(
+    @Inject("NOTIFICATIONS_SERVICE") private readonly client: ClientProxy,
+  ) {}
+
+  async onModuleInit() {
+    await this.client.connect();
+    console.log("✅ Cliente RabbitMQ conectado desde auth-usuarios");
+  }
+}
