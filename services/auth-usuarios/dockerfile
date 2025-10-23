@@ -10,9 +10,8 @@ COPY . .
 
 # Generar Prisma client
 RUN npx prisma generate --schema=prisma/schema.prisma
-RUN npx prisma migrate --schema=prisma/schema.prisma
 
-# Compilar NestJS a producción
+# Compilar NestJS
 RUN npm run build
 
 # Etapa 2: runtime
@@ -20,10 +19,10 @@ FROM node:20 AS runner
 
 WORKDIR /app
 
-# Copiamos solo lo necesario del builder
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/dist/src ./dist
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/package*.json ./
 
 ENV NODE_ENV=production
 ENV PORT=3001

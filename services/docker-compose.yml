@@ -27,7 +27,9 @@ services:
 
   # Microservicio auth-usuarios
   auth-usuarios:
-    build: ./auth-usuarios
+    build: 
+      context: ./auth-usuarios
+      dockerfile: Dockerfile
     container_name: auth-usuarios
     environment:
       DATABASE_URL: postgres://mu:mu@db-auth:5432/mercadourbano
@@ -40,6 +42,9 @@ services:
         condition: service_started
     ports:
       - "3001:3001"
+    command: >
+      sh -c "npx prisma migrate deploy --schema=prisma/schema.prisma &&
+         npm run start:prod"
 
   # Microservicio notificaciones
   notificaciones:
