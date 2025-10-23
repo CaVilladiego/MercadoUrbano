@@ -13,7 +13,6 @@ COPY . .
 
 #generar prisma
 RUN npx prisma generate --schema=src/infrastructure/prisma/schema.prisma
-RUN npx prisma migrate --schema=src/infrastructure/prisma/schema.prisma
 
 # Puerto expuesto
 EXPOSE 3000

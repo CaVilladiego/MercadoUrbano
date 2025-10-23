@@ -75,7 +75,7 @@ services:
   api-recomendaciones:
     build: ./recomendaciones
     env_file:
-    - ./recomendaciones/.env   # Aquí va la API key y otras cosas sensibles
+      - ./recomendaciones/.env
     environment:
       DATABASE_URL: postgres://mu:mu@db-recomendaciones:5432/recomendaciones
     depends_on:
@@ -83,6 +83,10 @@ services:
         condition: service_healthy
     ports:
       - "3000:3001"
+    command: >
+      sh -c "npx prisma migrate deploy --schema=src/infrastructure/prisma/schema.prisma &&
+             npm run start:prod"
+
 
   # Base de datos para catálogo de productos
   db-catalogo:
