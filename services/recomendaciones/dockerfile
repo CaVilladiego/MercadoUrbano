@@ -14,6 +14,8 @@ COPY . .
 #generar prisma
 RUN npx prisma generate --schema=src/infrastructure/prisma/schema.prisma
 
+COPY --from=builder /app/dist/src ./dist
+
 # Puerto expuesto
 EXPOSE 3000
 

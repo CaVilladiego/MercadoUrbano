@@ -1,0 +1,90 @@
+/* Paleta de colores principal */
+:root {
+  --color-bg: #121212; 
+  --color-surface: #1e1e1e;
+  --color-primary: #d32f2f;
+  --color-primary-hover: #b71c1c;
+  --color-text: #f5f5f5;
+  --color-muted: #bbbbbb;
+}
+
+/* Reseteo de estilos */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Contenedor del formulario */
+form {
+  background-color: var(--color-surface);
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
+  width: 360px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 1rem;
+  border: 1px solid var(--color-muted);
+  border-radius: 6px;
+  background-color: #2b2b2b;
+  color: var(--color-text);
+  font-size: 15px;
+}
+
+input::placeholder {
+  color: #999;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--color-primary);
+  border: none;
+  color: white;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+button:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* Links */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Textos auxiliares o de información */
+p {
+  text-align: center;
+  margin-top: 1rem;
+  color: var(--color-muted);
+}
