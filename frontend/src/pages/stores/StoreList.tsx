@@ -1,13 +1,16 @@
+import { useAuthStore } from "../../store/authStore";
 import { useCallback, useEffect, useState } from "react";
 import { getStores, deleteStore, type Store } from "../../api/stores.api";
 import { useParams } from "react-router-dom";
+import Layout from "../../components/Layout";
 
 export default function StoreList() {
+  const { user } = useAuthStore();
   const [stores, setStores] = useState<Store[]>([]);
   const [loading, setLoading] = useState(true);
   const { ownerId } = useParams();
 
-  // Cargar tiendas
+  // Hooks siemrpe de primero
   const fetchStores = useCallback(async () => {
     setLoading(true);
     try {
@@ -20,123 +23,86 @@ export default function StoreList() {
     }
   }, [ownerId]);
 
-  // Eliminar tienda
-  const handleDelete = async (storeId: string) => {
-    if (confirm("¿Desea eliminar esta tienda?")) {
-      try {
-        await deleteStore(ownerId!, storeId);
-        alert("Tienda eliminada correctamente");
-        fetchStores();
-      } catch {
-        alert("No se pudo eliminar la tienda");
-      }
-    }
-  };
-
   useEffect(() => {
     fetchStores();
   }, [fetchStores]);
 
+  // Luego viene la validación
+  if (!user || user.role !== "seller" || user.id !== ownerId) {
+    return (
+      <Layout>
+        <p style={{ marginTop: "2rem", textAlign: "center", color: "#ccc" }}>
+          ⚠ No tienes permisos para ver estas tiendas.
+        </p>
+      </Layout>
+    );
+  }
+
   return (
-    <div style={{ maxWidth: 900, margin: "2rem auto", color: "#f5f5f5" }}>
-      <h2 style={{ color: "#d32f2f", marginBottom: "1rem" }}>Mis Tiendas</h2>
+    <Layout>
+      <div style={{ maxWidth: 900, margin: "2rem auto", color: "#f5f5f5" }}>
+        <h2 style={{ color: "#d32f2f", marginBottom: "1rem" }}>Mis Tiendas</h2>
 
-      <button
-        onClick={() => (window.location.href = `/users/${ownerId}/stores/new`)}
-        style={{
-          background: "#d32f2f",
-          border: "none",
-          color: "white",
-          padding: "10px 18px",
-          marginBottom: "1.5rem",
-          borderRadius: "5px",
-          cursor: "pointer",
-          fontWeight: 600,
-        }}
-      >
-        + Nueva tienda
-      </button>
-
-      {loading ? (
-        <p style={{ color: "#bbb" }}>Cargando tiendas...</p>
-      ) : stores.length === 0 ? (
-        <p style={{ color: "#bbb" }}>No tienes tiendas registradas.</p>
-      ) : (
-        <table
+        <button
+          onClick={() => (window.location.href = `/users/${ownerId}/stores/new`)}
           style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            backgroundColor: "#1e1e1e",
-            borderRadius: "8px",
-            overflow: "hidden",
-            boxShadow: "0 0 10px rgba(0,0,0,0.4)",
+            background: "#d32f2f",
+            border: "none",
+            color: "white",
+            padding: "10px 18px",
+            marginBottom: "1.5rem",
+            borderRadius: "5px",
+            cursor: "pointer",
+            fontWeight: 600,
           }}
         >
-          <thead>
-            <tr style={{ backgroundColor: "#d32f2f", color: "white" }}>
-              <th style={{ padding: "12px", textAlign: "left" }}>Nombre</th>
-              <th style={{ padding: "12px", textAlign: "left" }}>Dirección</th>
-              <th style={{ padding: "12px", textAlign: "left" }}>Teléfono</th>
-              <th style={{ padding: "12px", textAlign: "center" }}>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {stores.map((store) => (
-              <tr
-                key={store.id}
-                style={{
-                  borderBottom: "1px solid #333",
-                  transition: "background 0.2s",
-                }}
-              >
-                <td style={{ padding: "12px" }}>{store.name}</td>
-                <td style={{ padding: "12px" }}>{store.address}</td>
-                <td style={{ padding: "12px" }}>{store.phone || "-"}</td>
-                <td
-                  style={{
-                    padding: "12px",
-                    textAlign: "center",
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: "10px",
-                  }}
-                >
-                  <button
-                    onClick={() =>
-                      (window.location.href = `/users/${ownerId}/stores/edit/${store.id}`)
-                    }
-                    style={{
-                      background: "transparent",
-                      border: "1px solid #d32f2f",
-                      color: "#d32f2f",
-                      padding: "6px 10px",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                      fontWeight: 500,
-                    }}
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => handleDelete(store.id)}
-                    style={{
-                      background: "#d32f2f",
-                      border: "none",
-                      color: "white",
-                      padding: "6px 10px",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                      fontWeight: 500,
-                    }}
-                  >
-                    Eliminar
-                  </button>
-                </td>
+          + Nueva tienda
+        </button>
+
+        {loading ? (
+          <p style={{ color: "#bbb" }}>Cargando tiendas...</p>
+        ) : stores.length === 0 ? (
+          <p style={{ color: "#bbb" }}>No tienes tiendas registradas.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Dirección</th>
+                <th>Teléfono</th>
+                <th>Acciones</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
+            </thead>
+
+            <tbody>
+              {stores.map((store) => (
+                <tr key={store.id}>
+                  <td>{store.name}</td>
+                  <td>{store.address}</td>
+                  <td>{store.phone || "-"}</td>
+                  <td className="table-actions">
+                    <button
+                      className="edit"
+                      onClick={() =>
+                        (window.location.href = `/users/${ownerId}/stores/edit/${store.id}`)
+                      }
+                    >
+                      Editar
+                    </button>
+
+                    <button
+                      className="delete"
+                      onClick={() => deleteStore(ownerId!, store.id)}
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </Layout>
   );
 }

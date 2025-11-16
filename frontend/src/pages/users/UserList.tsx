@@ -1,10 +1,14 @@
+import { useAuthStore } from "../../store/authStore";
 import { useEffect, useState } from "react";
 import { getUsers, deleteUser, type User } from "../../api/users.api";
+import Layout from "../../components/Layout";
 
 export default function UserList() {
+  const { user } = useAuthStore();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Hooks siempre antes del return condicional
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -17,82 +21,65 @@ export default function UserList() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm("¿Desea eliminar este usuario?")) {
-      try {
-        await deleteUser(id);
-        alert("Usuario eliminado");
-        fetchUsers();
-      } catch {
-        alert("No se pudo eliminar");
-      }
-    }
-  };
-
   useEffect(() => {
     fetchUsers();
   }, []);
 
+  // Validación después de hooks
+  if (!user || user.role !== "seller") {
+    return (
+      <Layout>
+        <p style={{ marginTop: "2rem", textAlign: "center", color: "#ccc" }}>
+          ⚠ No tienes permisos para ver usuarios.
+        </p>
+      </Layout>
+    );
+  }
+
   return (
-    <div style={{ maxWidth: 800, margin: "2rem auto" }}>
-      <h2>Usuarios</h2>
-      {loading ? (
-        <p>Cargando...</p>
-      ) : (
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            backgroundColor: "#1e1e1e",
-            color: "#f5f5f5",
-          }}
-        >
-          <thead>
-            <tr style={{ backgroundColor: "#d32f2f" }}>
-              <th style={{ padding: "10px" }}>ID</th>
-              <th>Nombre</th>
-              <th>Email</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u.id} style={{ borderBottom: "1px solid #333" }}>
-                <td style={{ padding: "10px" }}>{u.id}</td>
-                <td>{u.name}</td>
-                <td>{u.email}</td>
-                <td>
-                  <button
-                    onClick={() => (window.location.href = `/users/edit/${u.id}`)}
-                    style={{
-                      background: "transparent",
-                      border: "1px solid #d32f2f",
-                      color: "#d32f2f",
-                      padding: "5px 10px",
-                      marginRight: "6px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => handleDelete(u.id)}
-                    style={{
-                      background: "#d32f2f",
-                      border: "none",
-                      color: "white",
-                      padding: "5px 10px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Eliminar
-                  </button>
-                </td>
+    <Layout>
+      <div style={{ maxWidth: 800, margin: "2rem auto" }}>
+        <h2>Usuarios</h2>
+        {loading ? (
+          <p>Cargando...</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Acciones</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
+            </thead>
+
+            <tbody>
+              {users.map((u) => (
+                <tr key={u.id}>
+                  <td>{u.id}</td>
+                  <td>{u.name}</td>
+                  <td>{u.email}</td>
+                  <td className="table-actions">
+                    <button
+                      className="edit"
+                      onClick={() => (window.location.href = `/users/edit/${u.id}`)}
+                    >
+                      Editar
+                    </button>
+
+                    <button
+                      className="delete"
+                      onClick={() => deleteUser(u.id)}
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </Layout>
   );
 }

@@ -25,15 +25,63 @@ export default function Navbar() {
           color: "#d32f2f",
           fontWeight: 700,
           letterSpacing: "1px",
+          cursor: "pointer",
         }}
+        onClick={() => (window.location.href = "/dashboard")}
       >
         Mercado<span style={{ color: "white" }}>Urbano</span>
       </h1>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "1.5rem",
+        }}
+      >
+        {/* Comprador */}
+        {user?.role === "buyer" && (
+          <>
+            <a
+              href="/products"
+              style={{ color: "#bbb", textDecoration: "none" }}
+            >
+              Productos
+            </a>
+
+            <a
+              href="/cart"
+              style={{ color: "#bbb", textDecoration: "none" }}
+            >
+              Carrito 🛒
+            </a>
+          </>
+        )}
+
+        {/* Vendedor */}
+        {user?.role === "seller" && (
+          <>
+            <a
+              href="/products"
+              style={{ color: "#bbb", textDecoration: "none" }}
+            >
+              Mis Productos
+            </a>
+
+            <a
+              href={`/users/${user.id}/stores`}
+              style={{ color: "#bbb", textDecoration: "none" }}
+            >
+              Mis Tiendas
+            </a>
+          </>
+        )}
+
+        {/* Usuario */}
         <span style={{ color: "#bbb" }}>
           {user ? user.name || user.email : ""}
         </span>
+
         <button
           onClick={handleLogout}
           style={{

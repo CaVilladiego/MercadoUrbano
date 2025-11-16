@@ -13,23 +13,29 @@ export class LoginUserUseCase {
     @Inject(TOKEN_SIGNER) private readonly signer: TokenSignerPort,
   ) {}
 
-  async execute(input: LoginDto): Promise<{ access_token: string }> {
+  async execute(input: LoginDto): Promise<any> {
     const user = await this.repo.findByEmail(input.email);
     if (!user) throw new Error('InvalidCredentials');
 
     const ok = await this.hasher.compare(input.password, user.passwordHash);
     if (!ok) throw new Error('InvalidCredentials');
 
-    // Forzamos un expiresIn seguro al firmar
-    const access_token = await this.signer.sign(
-      {
-        sub: user.id,
-        email: user.email,
-        role: user.Rol,
-      },
-      { expiresIn: '1h' }
-    );
+    const payload = {
+      id: user.id,
+      email: user.email,
+      role: user.Rol,
+    };
 
-    return { access_token };
+    const token = await this.signer.sign(payload, { expiresIn: '1h' });
+
+    return {
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: `${user.PrimerNombre} ${user.Apellido}`,
+        role: user.Rol, // Cliente | Vendedor | Administrador
+      },
+    };
   }
 }

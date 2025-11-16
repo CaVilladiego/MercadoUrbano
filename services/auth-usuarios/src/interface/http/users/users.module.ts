@@ -1,6 +1,8 @@
 import { Module, OnModuleInit, Inject } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
+import { PassportModule } from "@nestjs/passport";
 import { ClientsModule, Transport, ClientProxy } from "@nestjs/microservices";
+import { APP_GUARD } from '@nestjs/core';
 
 import { UsersController } from "./users.controller";
 import { AuthController } from "./auth.controller";
@@ -27,6 +29,10 @@ import { ListStoresUseCase } from "@app/stores/usecases/list-stores.usecase";
 import { UpdateStoreUseCase } from "@app/stores/usecases/update-store.usecase";
 import { DeleteStoreUseCase } from "@app/stores/usecases/delete-store.usecase";
 
+import { JwtStrategy } from '@infra/security/jwt/jwt.strategy';
+import { RolesGuard } from '@infra/security/roles/roles.guard';
+import { JwtAuthGuard } from '@infra/security/jwt-auth.guard';
+
 import {
   USER_REPO,
   PASSWORD_HASHER,
@@ -36,29 +42,47 @@ import {
 
 @Module({
   imports: [
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: (process.env.JWT_SECRET || "changeme").trim(),
+      signOptions: { expiresIn: '1h' },
     }),
     ClientsModule.register([
       {
         name: "NOTIFICATIONS_SERVICE",
         transport: Transport.RMQ,
         options: {
-          urls: [process.env.RABBITMQ_URL || "amqp://guest:guest@rabbitmq:5672"], // usamos el host del contenedor
+          urls: [process.env.RABBITMQ_URL || "amqp://guest:guest@rabbitmq:5672"],
           queue: "notifications_queue",
           queueOptions: { durable: true },
         },
       },
     ]),
   ],
+
   controllers: [AuthController, UsersController, StoresController],
+
   providers: [
     PrismaService,
     BcryptHasher,
-    { provide: USER_REPO, useClass: PrismaUserRepository },
-    { provide: STORE_REPO, useClass: PrismaStoreRepository },
-    { provide: PASSWORD_HASHER, useClass: BcryptHasher },
-    { provide: TOKEN_SIGNER, useClass: JwtTokenSigner },
+    JwtStrategy,
+    {
+      provide: USER_REPO,
+      useClass: PrismaUserRepository,
+    },
+    {
+      provide: STORE_REPO,
+      useClass: PrismaStoreRepository,
+    },
+    {
+      provide: PASSWORD_HASHER,
+      useClass: BcryptHasher,
+    },
+    {
+      provide: TOKEN_SIGNER,
+      useClass: JwtTokenSigner,
+    },
+
     // Users
     RegisterUserUseCase,
     LoginUserUseCase,
@@ -67,12 +91,24 @@ import {
     SearchUsersUseCase,
     UpdateUserUseCase,
     DeleteUserUseCase,
+
     // Stores
     CreateStoreUseCase,
     ListStoresByOwnerUseCase,
     ListStoresUseCase,
     UpdateStoreUseCase,
     DeleteStoreUseCase,
+
+    // JWT GUARD GLOBAL
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    // ROLES GUARD GLOBAL
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
   ],
 })
 export class UsersModule implements OnModuleInit {
