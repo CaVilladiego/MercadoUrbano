@@ -1,32 +1,33 @@
-# Etapa 1: build
+# ---------------------------
+# 1. ETAPA DE BUILD
+# ---------------------------
 FROM node:20 AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 COPY . .
 
-# Generar Prisma client
 RUN npx prisma generate --schema=prisma/schema.prisma
-
-# Compilar NestJS
 RUN npm run build
 
-# Etapa 2: runtime
+
+# ---------------------------
+# 2. ETAPA FINAL
+# ---------------------------
 FROM node:20 AS runner
 
 WORKDIR /app
 
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist/src ./dist
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
-ENV NODE_ENV=production
 ENV PORT=3001
-
-EXPOSE 3001
 
 CMD ["node", "dist/main.js"]

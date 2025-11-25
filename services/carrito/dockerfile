@@ -1,37 +1,31 @@
-# ---------- STAGE 1: Builder ----------
 FROM node:20 AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
 COPY .env .env
+
 RUN npm install
+RUN npm install prisma@5.13.0 --save-dev
 
 COPY . .
 
-# Copiar SOLO lo necesario de Prisma
-RUN mkdir -p prisma/migrations && \
-    cp src/infrastructure/prisma/schema.prisma prisma/schema.prisma && \
-    cp -r src/infrastructure/prisma/migrations/* prisma/migrations/
-
-# Generar Prisma Client
+# Generar prisma client
 RUN npx prisma generate --schema=prisma/schema.prisma
 
-# Compilar NestJS
 RUN npm run build
 
-# ---------- STAGE 2: Runner ----------
 FROM node:20 AS runner
 
 WORKDIR /app
 
 COPY package*.json ./
-COPY .env .env
-RUN npm install --omit=dev
+RUN npm install
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
-EXPOSE 3001
+ENV PORT=3005
+
 CMD ["node", "dist/main.js"]

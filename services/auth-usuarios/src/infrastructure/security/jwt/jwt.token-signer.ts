@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { TokenSignerPort } from '@domain/security/token-signer.port';
-import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class JwtTokenSigner implements TokenSignerPort {
@@ -10,17 +10,21 @@ export class JwtTokenSigner implements TokenSignerPort {
     payload: Record<string, any>,
     opts?: { expiresIn?: string | number }
   ): Promise<string> {
-    const fromEnv = (process.env.JWT_EXPIRES_IN || '').trim();
-    const expiresIn =
-      opts?.expiresIn && String(opts.expiresIn).trim() !== ''
-        ? opts.expiresIn
-        : fromEnv && fromEnv !== ''
-        ? fromEnv
-        : '1h';
+    const fromEnv = process.env.JWT_EXPIRES_IN?.trim();
 
-    return this.jwt.signAsync(payload, {
-      secret: (process.env.JWT_SECRET || 'changeme').trim(),
-      expiresIn,
-    });
+    // Convertimos siempre a número
+    const parsedExpires =
+      opts?.expiresIn !== undefined
+        ? Number(opts.expiresIn)
+        : fromEnv
+        ? Number(fromEnv)
+        : 3600; // = 1h
+
+    const options: JwtSignOptions = {
+      secret: String(process.env.JWT_SECRET || 'changeme'),
+      expiresIn: parsedExpires,
+    };
+
+    return this.jwt.signAsync(payload, options);
   }
 }

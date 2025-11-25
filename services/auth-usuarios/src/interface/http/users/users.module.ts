@@ -31,7 +31,7 @@ import { DeleteStoreUseCase } from "@app/stores/usecases/delete-store.usecase";
 
 import { JwtStrategy } from '@infra/security/jwt/jwt.strategy';
 import { RolesGuard } from '@infra/security/roles/roles.guard';
-import { JwtAuthGuard } from '@infra/security/jwt-auth.guard';
+import { JwtAuthGuard } from '@infra/security/jwt/jwt-auth.guard';
 
 import {
   USER_REPO,

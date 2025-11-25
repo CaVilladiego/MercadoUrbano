@@ -82,7 +82,7 @@ export class PrismaStoreRepository implements StoreRepositoryPort {
     const arr = await this.prisma.store.findMany({ where: { ownerId } });
 
     return arr.map(
-      (s) =>
+      (s: any) =>
         new StoreEntity(
           s.id,
           s.ownerId,
@@ -109,7 +109,7 @@ export class PrismaStoreRepository implements StoreRepositoryPort {
     });
 
     return arr.map(
-      (s) =>
+      (s: any) =>
         new StoreEntity(
           s.id,
           s.ownerId,
