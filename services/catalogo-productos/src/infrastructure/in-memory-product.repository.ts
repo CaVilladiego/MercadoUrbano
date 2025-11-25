@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { ProductRepository } from '../core/domain/repositories/product.repository.port';
-import { Product } from '../core/domain/entities/product.entity';
+/* eslint-disable @typescript-eslint/require-await */
+import { Injectable } from "@nestjs/common";
+import { ProductRepository } from "../core/domain/repositories/product.repository.port";
+import { Product } from "../core/domain/entities/product.entity";
 
 @Injectable()
 export class InMemoryProductRepository implements ProductRepository {
@@ -13,7 +14,7 @@ export class InMemoryProductRepository implements ProductRepository {
 
   // Find a product by ID
   async findById(id: string): Promise<Product | null> {
-    const product = this.products.find(p => p.id_producto === id);
+    const product = this.products.find((p) => p.id_producto === id);
     return product || null;
   }
 

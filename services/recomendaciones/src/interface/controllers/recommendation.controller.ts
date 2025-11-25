@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 // controllers/recommendation.controller.ts
 import {
   Body,

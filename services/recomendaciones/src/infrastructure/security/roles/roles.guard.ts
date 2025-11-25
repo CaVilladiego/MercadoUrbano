@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   CanActivate,
   ExecutionContext,

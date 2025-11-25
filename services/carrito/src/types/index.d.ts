@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 import { Role } from './core/domain/entities/cart.entity';
 
 declare global {

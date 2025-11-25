@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Controller,
   Get,
@@ -7,17 +10,22 @@ import {
   NotFoundException,
   ForbiddenException,
   Req,
-} from '@nestjs/common';
-import { ApiTags, ApiOkResponse, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { CreateProductDto } from '../../core/application/dto/create-product.dto';
-import { ProductDto } from '../../core/application/dto/list-products.dto';
-import { CreateProductUseCase } from '../../core/application/usecases/create-product.usecase';
-import { GetProductUseCase } from '../../core/application/usecases/get-product.usecase';
-import { ListProductsUseCase } from '../../core/application/usecases/list-products.usecase';
-import { Product } from 'src/core/domain/entities/product.entity';
+} from "@nestjs/common";
+import {
+  ApiTags,
+  ApiOkResponse,
+  ApiResponse,
+  ApiBearerAuth,
+} from "@nestjs/swagger";
+import { CreateProductDto } from "../../core/application/dto/create-product.dto";
+import { ProductDto } from "../../core/application/dto/list-products.dto";
+import { CreateProductUseCase } from "../../core/application/usecases/create-product.usecase";
+import { GetProductUseCase } from "../../core/application/usecases/get-product.usecase";
+import { ListProductsUseCase } from "../../core/application/usecases/list-products.usecase";
+import { Product } from "src/core/domain/entities/product.entity";
 
-import { Roles } from '../../infrastructure/security/roles/roles.decorator';
-import type { Request } from 'express-serve-static-core';
+import { Roles } from "../../infrastructure/security/roles/roles.decorator";
+import type { Request } from "express-serve-static-core";
 
 function toProductDto(product: Product): ProductDto {
   return {
@@ -31,9 +39,9 @@ function toProductDto(product: Product): ProductDto {
   };
 }
 
-@ApiTags('Products')
+@ApiTags("Products")
 @ApiBearerAuth()
-@Controller('products')
+@Controller("products")
 export class ProductsController {
   constructor(
     private createProductUseCase: CreateProductUseCase,
@@ -42,20 +50,23 @@ export class ProductsController {
   ) {}
   // Crear producto
   @Post()
-  @Roles('Administrador', 'Vendedor')
+  @Roles("Administrador", "Vendedor")
   @ApiOkResponse({ type: ProductDto })
-  async create(@Body() dto: CreateProductDto, @Req() req: Request): Promise<ProductDto> {
+  async create(
+    @Body() dto: CreateProductDto,
+    @Req() req: Request,
+  ): Promise<ProductDto> {
     const requester = req.user as any;
 
     // Solo Admin o Vendedor
-    if (requester.Rol !== 'Administrador' && requester.Rol !== 'Vendedor') {
-      throw new ForbiddenException('No tienes permisos para crear productos');
+    if (requester.Rol !== "Administrador" && requester.Rol !== "Vendedor") {
+      throw new ForbiddenException("No tienes permisos para crear productos");
     }
 
     // Vendedor → solo puede crear productos para sí mismo
-    if (requester.Rol === 'Vendedor' && dto.id_vendedor !== requester.id) {
+    if (requester.Rol === "Vendedor" && dto.id_vendedor !== requester.id) {
       throw new ForbiddenException(
-        'No puedes crear productos para otro vendedor',
+        "No puedes crear productos para otro vendedor",
       );
     }
 
@@ -64,9 +75,9 @@ export class ProductsController {
   }
   // Ver un producto (público)
 
-  @Get(':id')
+  @Get(":id")
   @ApiOkResponse({ type: ProductDto })
-  async findOne(@Param('id') id: string): Promise<ProductDto> {
+  async findOne(@Param("id") id: string): Promise<ProductDto> {
     const product = await this.getProductUseCase.execute(id);
 
     if (!product) {
