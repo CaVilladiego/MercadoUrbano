@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAuthStore } from "../store/authStore";
 import { addToCart } from "../api/cart.api";
 
@@ -7,33 +8,46 @@ interface Props {
 
 export default function AddToCartButton({ productId }: Props) {
   const { user } = useAuthStore();
+  const [loading, setLoading] = useState(false);
 
   // Solo comprador puede agregar al carrito
   if (!user || user.role !== "buyer") return null;
 
   const handleAdd = async () => {
-    await addToCart({
-      userId: user.id,
-      productId,
-      quantity: 1,
-    });
+    if (loading) return;
 
-    alert("Producto agregado al carrito");
+    try {
+      setLoading(true);
+
+      await addToCart({
+        userId: user.id,
+        productId,
+        quantity: 1,
+      });
+
+      alert("Producto agregado al carrito");
+    } catch (error) {
+      console.error(error);
+      alert("Error al agregar al carrito");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <button
       onClick={handleAdd}
+      disabled={loading}
       style={{
-        background: "#d32f2f",
+        background: loading ? "#999" : "#d32f2f",
         border: "none",
         color: "white",
         padding: "6px 12px",
         borderRadius: "6px",
-        cursor: "pointer",
+        cursor: loading ? "not-allowed" : "pointer",
       }}
     >
-      🛒 Agregar
+      {loading ? "Agregando..." : "🛒 Agregar"}
     </button>
   );
 }

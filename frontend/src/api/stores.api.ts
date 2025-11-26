@@ -1,4 +1,4 @@
-import api from "./axiosInstance";
+import axiosAuth from "./axiosAuth";
 
 export interface Store {
   id: string;
@@ -9,17 +9,23 @@ export interface Store {
 }
 
 export const getStores = async (ownerId: string): Promise<Store[]> => {
-  const { data } = await api.get(`/users/${ownerId}/stores`);
+  const { data } = await axiosAuth.get<Store[]>(`/users/${ownerId}/stores`);
   return data;
 };
 
-export const getStore = async (ownerId: string, storeId: string): Promise<Store> => {
-  const { data } = await api.get(`/users/${ownerId}/stores/${storeId}`);
+export const getStore = async (
+  ownerId: string,
+  storeId: string
+): Promise<Store> => {
+  const { data } = await axiosAuth.get<Store>(`/users/${ownerId}/stores/${storeId}`);
   return data;
 };
 
-export const createStore = async (ownerId: string, payload: Partial<Store>): Promise<Store> => {
-  const { data } = await api.post(`/users/${ownerId}/stores`, payload);
+export const createStore = async (
+  ownerId: string,
+  payload: Partial<Store>
+): Promise<Store> => {
+  const { data } = await axiosAuth.post<Store>(`/users/${ownerId}/stores`, payload);
   return data;
 };
 
@@ -28,10 +34,13 @@ export const updateStore = async (
   storeId: string,
   payload: Partial<Store>
 ): Promise<Store> => {
-  const { data } = await api.patch(`/users/${ownerId}/stores/${storeId}`, payload);
+  const { data } = await axiosAuth.patch<Store>(`/users/${ownerId}/stores/${storeId}`, payload);
   return data;
 };
 
-export const deleteStore = async (ownerId: string, storeId: string): Promise<void> => {
-  await api.delete(`/users/${ownerId}/stores/${storeId}`);
+export const deleteStore = async (
+  ownerId: string,
+  storeId: string
+): Promise<void> => {
+  await axiosAuth.delete(`/users/${ownerId}/stores/${storeId}`);
 };

@@ -44,15 +44,13 @@ export default function App() {
           }
         />
 
-        {/* Venedor solamente */}
-
         <Route
           path="/users"
           element={
             <ProtectedRoute>
-              <SellerRoute>
+              <AdminRoute>
                 <UserList />
-              </SellerRoute>
+              </AdminRoute>
             </ProtectedRoute>
           }
         />
@@ -61,12 +59,13 @@ export default function App() {
           path="/users/edit/:id"
           element={
             <ProtectedRoute>
-              <SellerRoute>
+              <AdminRoute>
                 <UserForm />
-              </SellerRoute>
+              </AdminRoute>
             </ProtectedRoute>
           }
         />
+
 
         <Route
           path="/users/:ownerId/stores"

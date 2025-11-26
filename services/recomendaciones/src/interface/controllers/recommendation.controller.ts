@@ -27,6 +27,7 @@ import { GetAllRecommendationsUseCase } from '../../core/application/use-cases/g
 import { RecommendNearbyStoresUseCase } from '../../core/application/use-cases/recommend-nearby-stores.usecase';
 
 import { Roles } from '../../infrastructure/security/roles/roles.decorator';
+import { Public } from 'src/infrastructure/security/public.decorator';
 
 @ApiTags('Recommendations')
 @ApiBearerAuth()
@@ -50,6 +51,7 @@ export class RecommendationController {
   }
 
   @Post()
+  @Public()
   @Roles('Cliente', 'Administrador')
   @ApiOperation({ summary: 'Crear una nueva recomendación' })
   @ApiResponse({
@@ -70,6 +72,7 @@ export class RecommendationController {
   }
 
   @Post(':userId')
+  @Public()
   @Roles('Cliente', 'Administrador')
   @ApiOperation({ summary: 'Generar recomendaciones de sedes cercanas' })
   async generate(

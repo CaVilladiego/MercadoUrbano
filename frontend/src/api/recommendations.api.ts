@@ -1,4 +1,4 @@
-import api from "./axiosInstance";
+import axiosRecom from "./axiosRecommendations";
 
 export interface CreateRecommendationPayload {
   text: string;
@@ -12,17 +12,21 @@ export interface Recommendation {
   createdAt: string;
 }
 
-export async function createRecommendation(payload: CreateRecommendationPayload) {
-  const res = await api.post("/recommendations", payload);
-  return res.data;
-}
+export const createRecommendation = async (
+  payload: CreateRecommendationPayload
+): Promise<Recommendation> => {
+  const { data } = await axiosRecom.post<Recommendation>("/recommendations", payload);
+  return data;
+};
 
-export async function generateNearbyStores(userId: string) {
-  const res = await api.post(`/recommendations/${userId}`);
-  return res.data;
-}
+export const generateNearbyStores = async (
+  userId: string
+): Promise<Recommendation> => {
+  const { data } = await axiosRecom.post<Recommendation>(`/recommendations/${userId}`);
+  return data;
+};
 
-export async function getAllRecommendations() {
-  const res = await api.get("/recommendations");
-  return res.data;
-}
+export const getAllRecommendations = async (): Promise<Recommendation[]> => {
+  const { data } = await axiosRecom.get<Recommendation[]>("/recommendations");
+  return data;
+};

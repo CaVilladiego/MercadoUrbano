@@ -9,7 +9,7 @@ import {
   IsArray,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { Role } from '@prisma/client';
+import { Rol } from '@prisma/client';
 
 class StoreCreateDto {
   @ApiProperty()
@@ -115,10 +115,10 @@ export class CreateUserDto {
   @IsString()
   Referencia?: string;
 
-  @ApiPropertyOptional({ enum: Role, default: Role.Cliente })
+  @ApiPropertyOptional({ enum: Rol, default: Rol.Cliente })
   @IsOptional()
-  @IsEnum(Role)
-  Rol?: Role;
+  @IsEnum(Rol)
+  Rol?: Rol;
 
   @ApiPropertyOptional({ type: [StoreCreateDto] })
   @IsOptional()

@@ -12,7 +12,7 @@ export default function Dashboard() {
         {/* Mensaje según rol */}
         <p style={{ marginTop: "1rem", color: "#ccc" }}>
           {user?.role === "seller"
-            ? "Desde este panel puedes administrar tus usuarios, tiendas y productos."
+            ? "Desde este panel puedes administrar tus tiendas y productos."
             : "Explora los productos disponibles y gestiona tu carrito de compras."}
         </p>
 
@@ -28,20 +28,7 @@ export default function Dashboard() {
           {/* Vendedor */}
           {user?.role === "seller" && (
             <>
-              <a
-                href="/users"
-                style={{
-                  background: "#d32f2f",
-                  color: "white",
-                  padding: "1rem 2rem",
-                  borderRadius: "10px",
-                  textDecoration: "none",
-                  fontWeight: "600",
-                  transition: "all 0.2s ease-in-out",
-                }}
-              >
-                👥 Gestionar Usuarios
-              </a>
+              
 
               <a
                 href={`/users/${user.id}/stores`}

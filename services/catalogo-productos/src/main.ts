@@ -8,6 +8,13 @@ async function bootstrap() {
   // Optional: set a global prefix for all endpoints
   app.setGlobalPrefix("api");
 
+  app.enableCors({
+    origin: "*",
+    methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+    allowedHeaders: "Content-Type, Authorization",
+    credentials: true,
+  });
+
   // Swagger configuration
   const swaggerConfig = new DocumentBuilder()
     .setTitle("Productos Catálogo API")

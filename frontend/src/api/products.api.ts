@@ -1,4 +1,4 @@
-import api from "./axiosInstance";
+import axiosProducts from "./axiosProducts";
 
 export interface Product {
   id_producto: string;
@@ -20,18 +20,18 @@ export interface CreateProductPayload {
 }
 
 export const getProducts = async (): Promise<Product[]> => {
-  const { data } = await api.get("/products");
+  const { data } = await axiosProducts.get<Product[]>("/products");
   return data;
 };
 
 export const getProduct = async (id: string): Promise<Product> => {
-  const { data } = await api.get(`/products/${id}`);
+  const { data } = await axiosProducts.get<Product>(`/products/${id}`);
   return data;
 };
 
 export const createProduct = async (
   payload: CreateProductPayload
 ): Promise<Product> => {
-  const { data } = await api.post("/products", payload);
+  const { data } = await axiosProducts.post<Product>("/products", payload);
   return data;
 };

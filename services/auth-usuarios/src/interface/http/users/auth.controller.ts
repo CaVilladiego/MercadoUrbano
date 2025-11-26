@@ -5,6 +5,7 @@ import { CreateUserDto } from '@app/users/dto/create-user.dto';
 import { LoginDto } from '@app/users/dto/login.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserDto } from '@app/users/dto/user.dto';
+import { Public } from '@infra/security/public.decorator';
 
 @ApiTags('1️⃣ Autenticación')
 @Controller('auth')
@@ -15,6 +16,7 @@ export class AuthController {
   ) {}
 
   @Post('register')
+  @Public()
   @ApiOperation({ summary: 'Registrar un nuevo usuario' })
   @ApiResponse({ status: 201, description: 'Usuario creado', type: UserDto })
   registerUser(@Body() dto: CreateUserDto) {
@@ -22,6 +24,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @Public()
   @ApiOperation({ summary: 'Iniciar sesión y obtener token JWT' })
   @ApiResponse({ status: 200, description: 'Token JWT' })
   loginUser(@Body() dto: LoginDto) {

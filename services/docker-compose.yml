@@ -27,6 +27,11 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
 
   # =====================
   # AUTH-USUARIOS
@@ -41,14 +46,14 @@ services:
     environment:
       DATABASE_URL: postgres://mu:mu@db-auth:5432/mercadourbano
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET: super-secret-change-me
       NODE_ENV: production
       PORT: "3001"
     depends_on:
       db-auth:
         condition: service_healthy
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "3001:3001"
     command: >
@@ -105,7 +110,7 @@ services:
     environment:
       DATABASE_URL: postgres://mu:mu@db-recomendaciones:5432/recomendaciones
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET: super-secret-change-me
       PORT: "3001"
     depends_on:
       db-recomendaciones:
@@ -148,6 +153,7 @@ services:
       - ./catalogo-productos/.env
     environment:
       DATABASE_URL: postgresql://mu:mu@db-catalogo:5432/catalogo_productos
+      JWT_SECRET: super-secret-change-me
       PORT: "3004"
     depends_on:
       db-catalogo:
@@ -185,7 +191,7 @@ services:
     environment:
       DATABASE_URL: postgres://mu:mu@db-carrito:5432/carrito
       USERS_API_URL: http://auth-usuarios:3001
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET: super-secret-change-me
       PORT: "3005"
     depends_on:
       db-carrito:

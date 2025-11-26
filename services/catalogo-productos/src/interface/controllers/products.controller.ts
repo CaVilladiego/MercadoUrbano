@@ -26,6 +26,7 @@ import { Product } from "src/core/domain/entities/product.entity";
 
 import { Roles } from "../../infrastructure/security/roles/roles.decorator";
 import type { Request } from "express-serve-static-core";
+import { Public } from "src/infrastructure/security/public.decorator";
 
 function toProductDto(product: Product): ProductDto {
   return {
@@ -76,6 +77,7 @@ export class ProductsController {
   // Ver un producto (público)
 
   @Get(":id")
+  @Public()
   @ApiOkResponse({ type: ProductDto })
   async findOne(@Param("id") id: string): Promise<ProductDto> {
     const product = await this.getProductUseCase.execute(id);
@@ -90,6 +92,7 @@ export class ProductsController {
   // Listar productos (público)
 
   @Get()
+  @Public()
   @ApiOkResponse({ type: ProductDto, isArray: true })
   async findAll(): Promise<ProductDto[]> {
     const products = await this.listProductsUseCase.execute();

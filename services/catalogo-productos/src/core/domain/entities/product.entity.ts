@@ -6,6 +6,6 @@ export class Product {
     public readonly descripcion: string,
     public readonly precio: number,
     public readonly stock: number,
-    public readonly estado: string,
+    public readonly estado: boolean,
   ) {}
 }

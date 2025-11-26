@@ -26,7 +26,7 @@ export default function UserList() {
   }, []);
 
   // Validación después de hooks
-  if (!user || user.role !== "seller") {
+  if (!user || user.role !== "admin") {
     return (
       <Layout>
         <p style={{ marginTop: "2rem", textAlign: "center", color: "#ccc" }}>

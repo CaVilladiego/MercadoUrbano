@@ -1,6 +1,4 @@
-import api from "./axiosInstance";
-
-console.log("BASE URL:", import.meta.env.VITE_API_AUTH);
+import axiosAuth from "./axiosAuth";
 
 export interface LoginPayload {
   email: string;
@@ -35,15 +33,12 @@ export interface RegisterPayload {
   }>;
 }
 
-/* Login */
 export const login = async (payload: LoginPayload) => {
-  const { data } = await api.post("/auth/login", payload);
-  return data; // { token, user }
-};
-
-/* Registro */
-export const register = async (payload: RegisterPayload) => {
-  const { data } = await api.post("/auth/register", payload);
+  const { data } = await axiosAuth.post("/auth/login", payload);
   return data;
 };
 
+export const register = async (payload: RegisterPayload) => {
+  const { data } = await axiosAuth.post("/auth/register", payload);
+  return data;
+};

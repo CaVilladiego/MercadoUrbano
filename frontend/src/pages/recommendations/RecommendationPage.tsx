@@ -14,7 +14,23 @@ export default function RecommendationPage() {
   const [result, setResult] = useState<Recommendation | null>(null);
   const [loading, setLoading] = useState(false);
 
+
+  // Validación de roles
+  // Cliente → buyer
+  // Admin → admin
+
   if (!user) return null;
+
+  if (user.role !== "buyer" && user.role !== "admin") {
+    return (
+      <Layout>
+        <h2>Recomendaciones</h2>
+        <p style={{ color: "red", marginTop: "1rem" }}>
+          No tienes permisos para acceder a esta sección.
+        </p>
+      </Layout>
+    );
+  }
 
   const handleCreate = async () => {
     setLoading(true);
@@ -74,8 +90,13 @@ export default function RecommendationPage() {
           }}
         >
           <h3>Resultado</h3>
-          <p><strong>Respuesta:</strong> {result.response}</p>
-          <p><strong>Generado en:</strong> {new Date(result.createdAt).toLocaleString()}</p>
+          <p>
+            <strong>Respuesta:</strong> {result.response}
+          </p>
+          <p>
+            <strong>Generado en:</strong>{" "}
+            {new Date(result.createdAt).toLocaleString()}
+          </p>
         </div>
       )}
     </Layout>

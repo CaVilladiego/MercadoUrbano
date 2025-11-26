@@ -31,6 +31,7 @@ import { UpdateQuantityDto } from '../../core/application/dto/update-quantity.dt
 
 import { Roles } from '../../infrastructure/security/roles/roles.decorator';
 import { Request } from 'express-serve-static-core';
+import { Public } from 'src/infrastructure/security/public.decorator';
 
 @ApiTags('cart')
 @ApiBearerAuth()
@@ -45,6 +46,7 @@ export class CartController {
 
   // AGREGAR AL CARRITO
   @Post('add')
+  @Public()
   @Roles('Cliente', 'Vendedor', 'Administrador')
   @ApiOperation({ summary: 'Agregar ítem al carrito' })
   async add(@Body() dto: AddToCartDto, @Req() req: Request) {
@@ -59,6 +61,7 @@ export class CartController {
 
   // VER CARRITO
   @Get(':userId')
+  @Public()
   @Roles('Cliente', 'Vendedor', 'Administrador')
   @ApiOperation({ summary: 'Ver el carrito de un usuario' })
   async view(@Param('userId') userId: string, @Req() req: Request) {
@@ -73,6 +76,7 @@ export class CartController {
 
   // ELIMINAR ITEM
   @Delete(':userId/item/:productId')
+  @Public()
   @Roles('Cliente', 'Vendedor', 'Administrador')
   @ApiOperation({ summary: 'Eliminar ítem del carrito' })
   async remove(
@@ -90,6 +94,7 @@ export class CartController {
   }
   // ACTUALIZAR CANTIDAD
   @Patch('update')
+  @Public()
   @Roles('Cliente', 'Vendedor', 'Administrador')
   @ApiOperation({ summary: 'Actualizar cantidad' })
   async update(@Body() dto: UpdateQuantityDto, @Req() req: Request) {

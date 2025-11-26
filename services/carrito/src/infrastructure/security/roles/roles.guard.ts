@@ -29,7 +29,7 @@ export class RolesGuard implements CanActivate {
       return true; // si no hay roles, solo requiere JWT
     }
 
-    if (!requiredRoles.includes(user.role)) {
+    if (!requiredRoles.includes(user.Rol)) {
       throw new ForbiddenException('No tienes permisos para esta acción');
     }
 

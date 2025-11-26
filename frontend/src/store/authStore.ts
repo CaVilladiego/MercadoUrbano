@@ -6,7 +6,7 @@ type BackendUser = {
   id: string;
   email: string;
   name?: string;
-  role: "Cliente" | "Vendedor" | "Administrador";
+  Rol: "Cliente" | "Vendedor" | "Administrador"; // <-- CORREGIDO
 };
 
 type User = {
@@ -23,13 +23,9 @@ interface AuthState {
   logout: () => void;
 }
 
-/**
- * Convierte los roles del backend a los que usa el frontend.
- * Backend: Cliente, Vendedor, Administrador
- * Frontend: buyer, seller, admin
- */
-function normalizeRole(backendRole: BackendUser["role"]): Role {
-  switch (backendRole) {
+/* Normalizar roles */
+function normalizeRole(role: BackendUser["Rol"]): Role {
+  switch (role) {
     case "Cliente":
       return "buyer";
     case "Vendedor":
@@ -37,28 +33,36 @@ function normalizeRole(backendRole: BackendUser["role"]): Role {
     case "Administrador":
       return "admin";
     default:
-      throw new Error(`Unhandled backend role: ${backendRole}`);
+      throw new Error(`Unhandled backend role: ${role}`);
   }
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   token: localStorage.getItem("token"),
-  user: null,
+
+  // Cargar usuario desde localStorage si existe
+  user: localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user")!)
+    : null,
 
   setAuth: (token, backendUser) => {
     const normalizedUser: User = {
       id: backendUser.id,
       email: backendUser.email,
       name: backendUser.name,
-      role: normalizeRole(backendUser.role),
+      role: normalizeRole(backendUser.Rol), // <-- CORREGIDO
     };
 
+    // Persistencia
     localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(normalizedUser));
+
     set({ token, user: normalizedUser });
   },
 
   logout: () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     set({ token: null, user: null });
   },
 }));

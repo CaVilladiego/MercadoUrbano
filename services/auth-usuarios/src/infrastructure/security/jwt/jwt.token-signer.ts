@@ -4,27 +4,20 @@ import { TokenSignerPort } from '@domain/security/token-signer.port';
 
 @Injectable()
 export class JwtTokenSigner implements TokenSignerPort {
-  constructor(private readonly jwt: JwtService) {}
+  constructor(private readonly jwt: JwtService) { }
 
-  async sign(
-    payload: Record<string, any>,
-    opts?: { expiresIn?: string | number }
-  ): Promise<string> {
-    const fromEnv = process.env.JWT_EXPIRES_IN?.trim();
+  async sign(payload: Record<string, any>, opts?: { expiresIn?: number }): Promise<string> {
+  
+  const normalizedPayload = {
+    sub: payload.id,
+    email: payload.email,
+    Rol: payload.Rol, 
+  };
 
-    // Convertimos siempre a número
-    const parsedExpires =
-      opts?.expiresIn !== undefined
-        ? Number(opts.expiresIn)
-        : fromEnv
-        ? Number(fromEnv)
-        : 3600; // = 1h
+  return this.jwt.signAsync(normalizedPayload, {
+    secret: String(process.env.JWT_SECRET || 'changeme'),
+    expiresIn: opts?.expiresIn ?? Number(process.env.JWT_EXPIRES_IN ?? 3600),
+  });
+}
 
-    const options: JwtSignOptions = {
-      secret: String(process.env.JWT_SECRET || 'changeme'),
-      expiresIn: parsedExpires,
-    };
-
-    return this.jwt.signAsync(payload, options);
-  }
 }

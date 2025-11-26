@@ -1,4 +1,4 @@
-import api from "./axiosInstance";
+import axiosAuth from "./axiosAuth";
 
 export interface User {
   id: string;
@@ -8,20 +8,20 @@ export interface User {
 }
 
 export const getUsers = async (): Promise<User[]> => {
-  const { data } = await api.get("/users");
+  const { data } = await axiosAuth.get("/users");
   return data;
 };
 
 export const getUser = async (id: string): Promise<User> => {
-  const { data } = await api.get(`/users/${id}`);
+  const { data } = await axiosAuth.get(`/users/${id}`);
   return data;
 };
 
 export const updateUser = async (id: string, payload: Partial<User>) => {
-  const { data } = await api.patch(`/users/${id}`, payload);
+  const { data } = await axiosAuth.patch(`/users/${id}`, payload);
   return data;
 };
 
 export const deleteUser = async (id: string) => {
-  await api.delete(`/users/${id}`);
+  await axiosAuth.delete(`/users/${id}`);
 };

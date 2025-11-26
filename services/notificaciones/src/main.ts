@@ -12,6 +12,13 @@ async function bootstrap() {
   // Prefijo global de la API
   app.setGlobalPrefix('api');
 
+  app.enableCors({
+  origin: "*",
+  methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+  allowedHeaders: 'Content-Type, Authorization',
+  credentials: true,
+});
+
   // Configuración Swagger
   const config = new DocumentBuilder()
     .setTitle('Notificaciones API')

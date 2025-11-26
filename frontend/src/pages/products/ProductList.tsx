@@ -82,10 +82,7 @@ export default function ProductList() {
 
                 <td>
                   {user?.role === "buyer" && (
-                    <AddToCartButton
-                      productId={p.id_producto}
-                      sellerId={p.id_vendedor}
-                    />
+                    <AddToCartButton productId={p.id_producto} />
                   )}
 
                   {user?.role === "seller" && (
