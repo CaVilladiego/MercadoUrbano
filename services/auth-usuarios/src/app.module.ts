@@ -10,8 +10,8 @@ import { UsersModule } from '@interface/http/users/users.module';
         name: 'NOTIFICATIONS_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://guest:guest@localhost:5672'],
-          queue: 'notifications_queue',
+          urls: [process.env.RABBITMQ_URL || 'amqp://guest:guest@rabbitmq:5672'],
+          queue: 'notifications_queue', 
           queueOptions: { durable: true },
         },
       },
@@ -19,4 +19,3 @@ import { UsersModule } from '@interface/http/users/users.module';
   ],
 })
 export class AppModule {}
-

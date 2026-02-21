@@ -1,7 +1,8 @@
-version: "3.9"
-
 services:
-  # Base de datos para auth-usuarios
+
+  # =====================
+  # DATABASE: AUTH-USUARIOS
+  # =====================
   db-auth:
     image: postgres:16
     environment:
@@ -18,33 +19,57 @@ services:
       timeout: 5s
       retries: 20
 
+  # =====================
   # RabbitMQ
+  # =====================
   rabbitmq:
     image: rabbitmq:3-management
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
 
-  # Microservicio auth-usuarios
+  # =====================
+  # AUTH-USUARIOS
+  # =====================
   auth-usuarios:
-    build: ./auth-usuarios
+    build:
+      context: ./auth-usuarios
+      dockerfile: dockerfile
     container_name: auth-usuarios
+    env_file:
+      - ./auth-usuarios/.env
     environment:
       DATABASE_URL: postgres://mu:mu@db-auth:5432/mercadourbano
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      JWT_SECRET: super-secret-change-me
       NODE_ENV: production
+      PORT: "3001"
     depends_on:
       db-auth:
         condition: service_healthy
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "3001:3001"
+    command: >
+      sh -c "npx prisma migrate deploy --schema=prisma/schema.prisma &&
+             npm run start:prod"
 
-  # Microservicio notificaciones
+  # =====================
+  # NOTIFICACIONES
+  # =====================
   notificaciones:
-    build: ./notificaciones
+    build: 
+      context: ./notificaciones
+      dockerfile: dockerfile
     container_name: notificaciones
+    env_file:
+      - ./notificaciones/.env
     environment:
       NODE_ENV: production
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
@@ -54,7 +79,9 @@ services:
     ports:
       - "3002:3002"
 
-  # Base de datos para recomendaciones
+  # =====================
+  # DATABASE: RECOMENDACIONES
+  # =====================
   db-recomendaciones:
     image: postgres:16
     environment:
@@ -71,19 +98,32 @@ services:
       timeout: 5s
       retries: 20
 
-  # API de recomendaciones
+  # =====================
+  # API RECOMENDACIONES
+  # =====================
   api-recomendaciones:
-    build: ./recomendaciones
+    build: 
+      context: ./recomendaciones
+      dockerfile: dockerfile
+    env_file:
+      - ./recomendaciones/.env
     environment:
       DATABASE_URL: postgres://mu:mu@db-recomendaciones:5432/recomendaciones
-      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      JWT_SECRET: super-secret-change-me
+      PORT: "3001"
     depends_on:
       db-recomendaciones:
         condition: service_healthy
     ports:
-      - "3000:3000"
+      - "3000:3001"
+    command: >
+      sh -c "npx prisma migrate deploy --schema=prisma/schema.prisma &&
+            npm run start:prod"
 
-  # Base de datos para catálogo de productos
+  # =====================
+  # DATABASE: CATALOGO PRODUCTOS
+  # =====================
   db-catalogo:
     image: postgres:16
     environment:
@@ -100,36 +140,72 @@ services:
       timeout: 5s
       retries: 20
 
-  # API de catálogo
+  # =====================
+  # API CATALOGO PRODUCTOS
+  # =====================
   catalogo-productos:
-    build: ./catalogo-productos
+    build: 
+      context: ./catalogo-productos
+      dockerfile: dockerfile
     ports:
       - "3004:3004"
-    volumes:
-      - ./catalogo-productos:/app
-      - /app/node_modules
     env_file:
       - ./catalogo-productos/.env
+    environment:
+      DATABASE_URL: postgresql://mu:mu@db-catalogo:5432/catalogo_productos
+      JWT_SECRET: super-secret-change-me
+      PORT: "3004"
+    depends_on:
+      db-catalogo:
+        condition: service_healthy
 
-  # Base de datos para pedidos
-  db-pedidos:
+  # =====================
+  # DATABASE: CARRITO
+  # =====================
+  db-carrito:
     image: postgres:16
     environment:
       POSTGRES_USER: mu
       POSTGRES_PASSWORD: mu
-      POSTGRES_DB: pedidos
+      POSTGRES_DB: carrito
     ports:
-      - "5435:5432"
+      - "5436:5432"
     volumes:
-      - db_pedidos_data:/var/lib/postgresql/data
+      - db_carrito_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mu -d pedidos"]
+      test: ["CMD-SHELL", "pg_isready -U mu -d carrito"]
       interval: 5s
       timeout: 5s
       retries: 20
+
+  # =====================
+  # API CARRITO
+  # =====================
+  carrito:
+    build:
+      context: ./carrito
+      dockerfile: dockerfile
+    container_name: carrito
+    env_file:
+      - ./carrito/.env
+    environment:
+      DATABASE_URL: postgres://mu:mu@db-carrito:5432/carrito
+      USERS_API_URL: http://auth-usuarios:3001
+      JWT_SECRET: super-secret-change-me
+      PORT: "3005"
+    depends_on:
+      db-carrito:
+        condition: service_healthy
+      auth-usuarios:
+        condition: service_started
+    ports:
+      - "3005:3005"
+    command: >
+      sh -c "npx prisma migrate deploy --schema=prisma/schema.prisma &&
+             npm run start:prod"
 
 volumes:
   db_auth_data:
   db_recomendaciones_data:
   db_catalogo_data:
-  db_pedidos_data:
+  db_carrito_data:

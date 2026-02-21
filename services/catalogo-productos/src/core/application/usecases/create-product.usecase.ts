@@ -1,11 +1,14 @@
-import { Injectable, Inject  } from '@nestjs/common';
-import { Product } from '../../domain/entities/product.entity';
-import type { ProductRepository } from '../../domain/repositories/product.repository.port';
-import { CreateProductDto } from '../dto/create-product.dto';
+import { Injectable, Inject } from "@nestjs/common";
+import { Product } from "../../domain/entities/product.entity";
+import type { ProductRepository } from "../../domain/repositories/product.repository.port";
+import { CreateProductDto } from "../dto/create-product.dto";
 
 @Injectable()
 export class CreateProductUseCase {
-  constructor(@Inject('ProductRepository') private readonly productRepo: ProductRepository) {}
+  constructor(
+    @Inject("ProductRepository")
+    private readonly productRepo: ProductRepository,
+  ) {}
 
   async execute(input: CreateProductDto): Promise<Product> {
     // Create a new domain entity
@@ -16,14 +19,12 @@ export class CreateProductUseCase {
       input.descripcion,
       Number(input.precio),
       Number(input.stock),
-      input.estado
-
+      Boolean(input.estado),
     );
 
-    if (+product.stock < 0) throw new Error('Stock cannot be negative');
-
+    if (+product.stock < 0) throw new Error("Stock cannot be negative");
 
     await this.productRepo.save(product);
-    return product
+    return product;
   }
 }

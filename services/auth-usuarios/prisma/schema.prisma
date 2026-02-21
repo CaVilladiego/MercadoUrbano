@@ -15,7 +15,7 @@ model User {
   SegundoNombre String?
   Apellido      String
   Telefono      String
-  Rol           Role      @default(Cliente)
+  Rol           Rol      @default(Cliente)
   isActive      Boolean   @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -59,7 +59,7 @@ model Store {
 }
 
 
-enum Role {
+enum Rol {
   Cliente
   Vendedor
   Administrador

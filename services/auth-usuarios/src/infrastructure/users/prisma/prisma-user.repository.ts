@@ -116,7 +116,7 @@ export class PrismaUserRepository implements UserRepositoryPort {
       orderBy: { createdAt: 'desc' },
     });
 
-    return arr.map(u => {
+    return arr.map((u: any) => {
       const address = u.addresses[0];
       return new UserEntity(
         u.id, u.email, u.passwordHash,
@@ -229,7 +229,7 @@ export class PrismaUserRepository implements UserRepositoryPort {
       orderBy: { createdAt: 'desc' },
     });
 
-    return arr.map(u => {
+    return arr.map((u: any) => {
       const address = u.addresses[0];
       return new UserEntity(
         u.id, u.email, u.passwordHash,

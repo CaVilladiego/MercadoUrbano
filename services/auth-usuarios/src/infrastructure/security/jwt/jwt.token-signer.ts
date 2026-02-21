@@ -1,26 +1,23 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { TokenSignerPort } from '@domain/security/token-signer.port';
-import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class JwtTokenSigner implements TokenSignerPort {
-  constructor(private readonly jwt: JwtService) {}
+  constructor(private readonly jwt: JwtService) { }
 
-  async sign(
-    payload: Record<string, any>,
-    opts?: { expiresIn?: string | number }
-  ): Promise<string> {
-    const fromEnv = (process.env.JWT_EXPIRES_IN || '').trim();
-    const expiresIn =
-      opts?.expiresIn && String(opts.expiresIn).trim() !== ''
-        ? opts.expiresIn
-        : fromEnv && fromEnv !== ''
-        ? fromEnv
-        : '1h';
+  async sign(payload: Record<string, any>, opts?: { expiresIn?: number }): Promise<string> {
+  
+  const normalizedPayload = {
+    sub: payload.id,
+    email: payload.email,
+    Rol: payload.Rol, 
+  };
 
-    return this.jwt.signAsync(payload, {
-      secret: (process.env.JWT_SECRET || 'changeme').trim(),
-      expiresIn,
-    });
-  }
+  return this.jwt.signAsync(normalizedPayload, {
+    secret: String(process.env.JWT_SECRET || 'changeme'),
+    expiresIn: opts?.expiresIn ?? Number(process.env.JWT_EXPIRES_IN ?? 3600),
+  });
+}
+
 }

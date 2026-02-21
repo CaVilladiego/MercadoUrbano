@@ -5,10 +5,18 @@ import { SearchUsersUseCase } from '@app/users/usecases/search-users.usecase';
 import { UpdateUserUseCase } from '@app/users/usecases/update-user.usecase';
 import { DeleteUserUseCase } from '@app/users/usecases/delete-user.usecase';
 import { UpdateUserDto } from '@app/users/dto/update-user.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { UserDto } from '@app/users/dto/user.dto';
+import { Roles } from '@infra/security/roles/roles.decorator';
 
 @ApiTags('2️⃣ Usuarios')
+@ApiBearerAuth()
+@Roles('Administrador') // Solo para Administrador
 @Controller('users')
 export class UsersController {
   constructor(
@@ -20,7 +28,6 @@ export class UsersController {
   ) {}
 
   @Get()
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Listar todos los usuarios' })
   @ApiResponse({ status: 200, type: [UserDto] })
   list() {
@@ -28,7 +35,6 @@ export class UsersController {
   }
 
   @Get(':id')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtener un usuario por su ID' })
   @ApiResponse({ status: 200, type: UserDto })
   get(@Param('id') id: string) {
@@ -43,7 +49,6 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Actualizar un usuario' })
   @ApiResponse({ status: 200, description: 'Usuario actualizado' })
   update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
@@ -51,7 +56,6 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Eliminar un usuario' })
   @ApiResponse({ status: 200, description: 'Usuario eliminado' })
   remove(@Param('id') id: string) {

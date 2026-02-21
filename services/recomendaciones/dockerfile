@@ -1,18 +1,37 @@
-# Imagen base
-FROM node:20
+# ---------- STAGE 1: Builder ----------
+FROM node:20 AS builder
 
-# Carpeta de trabajo
 WORKDIR /app
 
-# Copiar dependencias e instalarlas
 COPY package*.json ./
+COPY .env .env
 RUN npm install
 
-# Copiar el resto del código
 COPY . .
 
-# Puerto expuesto
-EXPOSE 3000
+# Copiar SOLO lo necesario de Prisma
+RUN mkdir -p prisma/migrations && \
+    cp src/infrastructure/prisma/schema.prisma prisma/schema.prisma && \
+    cp -r src/infrastructure/prisma/migrations/* prisma/migrations/
 
-# Comando de arranque
-CMD ["npm", "run", "start:dev"]
+# Generar Prisma Client
+RUN npx prisma generate --schema=prisma/schema.prisma
+
+# Compilar NestJS
+RUN npm run build
+
+# ---------- STAGE 2: Runner ----------
+FROM node:20 AS runner
+
+WORKDIR /app
+
+COPY package*.json ./
+COPY .env .env
+RUN npm install --omit=dev
+
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
+EXPOSE 3001
+CMD ["node", "dist/main.js"]
